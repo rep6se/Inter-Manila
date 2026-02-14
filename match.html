@@ -58,6 +58,18 @@ background:#1d4ed8;
 transform:scale(1.03);
 }
 
+.player{
+background:#1e293b;
+padding:12px;
+border-radius:12px;
+margin-top:10px;
+text-align:left;
+}
+
+.hr{
+border-color:#334155;
+}
+
 .back{
 margin-top:20px;
 display:block;
@@ -77,11 +89,7 @@ text-decoration:none;
 <h3>New Match</h3>
 
 <select id="liga">
-<option value="">Select League</option>
-<option value="UEL">UEL</option>
-<option value="Elite">Elite</option>
-<option value="PTL">PTL</option>
-<option value="USL">USL</option>
+<option value="">Loading leagues...</option>
 </select>
 
 <input type="number" id="score_for" placeholder="Our Score">
@@ -120,28 +128,41 @@ onAuthStateChanged(auth, (user) => {
   if (!user) window.location.href="index.html";
 });
 
-/* Load players untuk input stats */
+/* Load semua liga */
+async function loadLeagues() {
+  const leagueSnap = await getDocs(collection(db,"leagues"));
+  let html = '<option value="">Select League</option>';
+  leagueSnap.forEach(docSnap => {
+    html += `<option value="${docSnap.data().name}">${docSnap.data().name}</option>`;
+  });
+  document.getElementById("liga").innerHTML = html;
+}
+loadLeagues();
+
+/* Load semua pemain */
 async function loadPlayers(){
   const querySnapshot = await getDocs(collection(db,"players"));
   let html="";
-  querySnapshot.forEach((doc)=>{
-    let p = doc.data();
+
+  querySnapshot.forEach((docSnap)=>{
+    let p = docSnap.data();
     html+=`
-      <div>
-        <b>#${p.number} ${p.name}</b><br>
-        Goals: <input type="number" min="0" value="0" id="g_${doc.id}">
-        Assist: <input type="number" min="0" value="0" id="a_${doc.id}">
-        Saves: <input type="number" min="0" value="0" id="s_${doc.id}">
+      <div class="player">
+        <b>#${p.number} ${p.name}</b> (${p.pos})<br>
+        Goals: <input type="number" min="0" value="0" id="g_${docSnap.id}">
+        Assist: <input type="number" min="0" value="0" id="a_${docSnap.id}">
+        Saves: <input type="number" min="0" value="0" id="s_${docSnap.id}">
       </div>
-      <hr style="border-color:#334155;">
+      <hr class="hr">
     `;
   });
+
   document.getElementById("playersList").innerHTML = html;
 }
 
 loadPlayers();
 
-/* Submit match */
+/* Submit match dan update stats */
 window.submitMatch = async function(){
   const liga = document.getElementById("liga").value;
   const score_for = parseInt(document.getElementById("score_for").value);
