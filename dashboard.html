@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Inter Manila Manager</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#0f172a;
+color:white;
+text-align:center;
+}
+
+.header{
+background:#020617;
+padding:20px;
+font-size:22px;
+font-weight:bold;
+border-bottom:2px solid #1e293b;
+}
+
+.container{
+padding:25px;
+}
+
+.menu{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+margin-top:25px;
+}
+
+.btn{
+background:#1e293b;
+padding:18px;
+border-radius:14px;
+text-decoration:none;
+color:white;
+font-weight:bold;
+display:block;
+transition:0.2s;
+}
+
+.btn:hover{
+background:#334155;
+transform:scale(1.03);
+}
+
+.logout{
+margin-top:30px;
+background:#dc2626;
+padding:12px;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+INTER MANILA — MANAGER PANEL
+</div>
+
+<div class="container">
+
+<h2>Main Menu</h2>
+
+<div class="menu">
+<a class="btn" href="squad.html">👥 Squad</a>
+<a class="btn" href="match.html">⚽ Input Match</a>
+<a class="btn" href="leaderboard.html">🏆 Leaderboard</a>
+<a class="btn" href="liga.html">📋 Leagues</a>
+</div>
+
+<div class="logout" onclick="logout()">Logout</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuqUcXYjMU-XaL_w7h4y43RHku4dQGFlk",
+  authDomain: "inter-manila.firebaseapp.com",
+  projectId: "inter-manila",
+  storageBucket: "inter-manila.firebasestorage.app",
+  messagingSenderId: "285507279342",
+  appId: "1:285507279342:web:5aa0c80a08fb92727416ff"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+/* CEK LOGIN */
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+  }
+});
+
+/* LOGOUT */
+window.logout = function(){
+  signOut(auth);
+};
+
+</script>
+
+</body>
+  </html>
