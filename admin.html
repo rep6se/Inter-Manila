@@ -1,0 +1,239 @@
+<!DOCTYPE html><html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inter Manila Admin Panel</title><style>
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#0b0f1a;
+    color:white;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+h2{margin-top:40px;}
+
+.card{
+    background:#121a33;
+    padding:15px;
+    border-radius:12px;
+    border:1px solid #1e3cff;
+    margin-bottom:20px;
+}
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    border-radius:8px;
+    border:none;
+    background:#0b1024;
+    color:white;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:12px;
+    border:none;
+    border-radius:10px;
+    background:#1e3cff;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.smallBtn{
+    width:auto;
+    padding:6px 10px;
+    margin-left:10px;
+    background:#ff4b4b;
+}
+
+.playerRow{
+    padding:8px;
+    border-bottom:1px solid #233;
+}
+
+.hidden{display:none;}
+</style></head><body><!-- LOGIN --><div id="loginBox" class="card" style="max-width:320px;margin:120px auto;">
+<h2>Admin Login</h2>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="loginMsg"></p>
+</div><!-- APP --><div id="app" class="container hidden"><h1>Inter Manila — Admin Panel</h1><div class="card">
+<h2>Add Player</h2>
+<input id="pname" placeholder="Player Name">
+<input id="pnumber" type="number" placeholder="Number"><select id="ppos">
+<option>GK</option>
+<option>CB</option>
+<option>LB</option>
+<option>RB</option>
+<option>DMF</option>
+<option>CMF</option>
+<option>AMF</option>
+<option>LWF</option>
+<option>RWF</option>
+<option>SS</option>
+<option>CF</option>
+</select><button onclick="addPlayer()">Add Player</button>
+
+</div><div class="card">
+<h2>Squad List</h2>
+<div id="playerList"></div>
+</div><div class="card">
+<h2>Add League</h2>
+<input id="leagueName" placeholder="League name">
+<button onclick="addLeague()">Add League</button>
+<div id="leagueList"></div>
+</div><div class="card">
+<h2>Input Match</h2><select id="competition"></select>
+
+<input id="opponent" placeholder="Opponent">
+<input id="ourScore" type="number" placeholder="Our Score">
+<input id="theirScore" type="number" placeholder="Their Score"><div id="statInputs"></div><button onclick="submitMatch()">Submit Match</button>
+
+</div></div><script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuqUcXYjMU-XaL_w7h4y43RHku4dQGFlk",
+  authDomain: "inter-manila.firebaseapp.com",
+  projectId: "inter-manila",
+  storageBucket: "inter-manila.firebasestorage.app",
+  messagingSenderId: "285507279342",
+  appId: "1:285507279342:web:5aa0c80a08fb92727416ff"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+window.login = async function(){
+try{
+await signInWithEmailAndPassword(auth,email.value,password.value);
+}catch(e){
+loginMsg.innerText="Login gagal";
+}
+}
+
+onAuthStateChanged(auth,(user)=>{
+if(user){
+loginBox.style.display="none";
+app.classList.remove("hidden");
+loadPlayers();
+loadLeagues();
+}
+});
+
+/* PLAYERS */
+
+async function loadPlayers(){
+const snap = await getDocs(collection(db,"players"));
+let html="";
+let statHTML="";
+
+snap.forEach(d=>{
+let p=d.data();
+html+=`<div class="playerRow">${p.name} (#${p.number})
+<button class="smallBtn" onclick="deletePlayer('${d.id}')">X</button></div>`;
+
+statHTML+=`
+<div>
+<b>${p.name}</b><br>
+Goals <input id="g_${d.id}" type="number" value="0">
+Assist <input id="a_${d.id}" type="number" value="0">
+Saves <input id="s_${d.id}" type="number" value="0">
+</div><hr>`;
+});
+
+playerList.innerHTML=html;
+statInputs.innerHTML=statHTML;
+}
+
+window.addPlayer = async function(){
+await addDoc(collection(db,"players"),{
+name:pname.value,
+number:Number(pnumber.value),
+pos:ppos.value,
+goals:0,assist:0,saves:0,match:0
+});
+loadPlayers();
+}
+
+window.deletePlayer = async function(id){
+await deleteDoc(doc(db,"players",id));
+loadPlayers();
+}
+
+/* LEAGUES */
+
+async function loadLeagues(){
+const snap = await getDocs(collection(db,"leagues"));
+let html="";
+competition.innerHTML="";
+snap.forEach(d=>{
+let l=d.data();
+html+=`${l.name}
+<button class="smallBtn" onclick="deleteLeague('${d.id}')">X</button><br>`;
+competition.innerHTML+=`<option>${l.name}</option>`;
+});
+leagueList.innerHTML=html;
+}
+
+window.addLeague = async function(){
+await addDoc(collection(db,"leagues"),{name:leagueName.value});
+loadLeagues();
+}
+
+window.deleteLeague = async function(id){
+await deleteDoc(doc(db,"leagues",id));
+loadLeagues();
+}
+
+/* MATCH */
+
+window.submitMatch = async function(){
+
+let playersSnap = await getDocs(collection(db,"players"));
+
+playersSnap.forEach(async d=>{
+let p=d.data();
+
+let g=Number(document.getElementById("g_"+d.id).value);
+let a=Number(document.getElementById("a_"+d.id).value);
+let s=Number(document.getElementById("s_"+d.id).value);
+
+if(g||a||s){
+await updateDoc(doc(db,"players",d.id),{
+goals:p.goals+g,
+assist:p.assist+a,
+saves:p.saves+s,
+match:p.match+1
+});
+}
+});
+
+await addDoc(collection(db,"matches"),{
+competition:competition.value,
+opponent:opponent.value,
+ourScore:Number(ourScore.value),
+theirScore:Number(theirScore.value),
+date:new Date().toISOString()
+});
+
+alert("Match saved!");
+loadPlayers();
+}
+
+</script></body>
+                 </html>
