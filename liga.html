@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leagues — Inter Manila</title>
+
+<style>
+body{
+margin:0;
+font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background: linear-gradient(135deg,#0f172a,#020617);
+color:white;
+text-align:center;
+}
+
+.header{
+background:#020617;
+padding:18px;
+font-size:22px;
+font-weight:bold;
+border-bottom:2px solid #1e293b;
+}
+
+.container{
+padding:25px;
+max-width:500px;
+margin:auto;
+}
+
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:none;
+border-radius:10px;
+background:#1e293b;
+color:white;
+font-size:14px;
+}
+
+button{
+width:100%;
+padding:14px;
+margin-top:10px;
+border:none;
+border-radius:12px;
+background:#2563eb;
+color:white;
+font-weight:bold;
+font-size:15px;
+cursor:pointer;
+transition:0.2s;
+}
+
+button:hover{
+background:#1d4ed8;
+transform:scale(1.03);
+}
+
+.league{
+background:#1e293b;
+padding:12px;
+border-radius:12px;
+margin-top:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.league button{
+width:auto;
+padding:6px 10px;
+margin:0 2px;
+font-size:13px;
+}
+
+.back{
+margin-top:20px;
+display:block;
+text-align:center;
+color:#93c5fd;
+text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">INTER MANILA — LEAGUES</div>
+
+<div class="container">
+
+<h3>Add New League</h3>
+<input id="leagueName" placeholder="League Name">
+<button onclick="addLeague()">Add League</button>
+
+<h3>Existing Leagues</h3>
+<div id="leagueList">Loading...</div>
+
+<a class="back" href="dashboard.html">← Back to Menu</a>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuqUcXYjMU-XaL_w7h4y43RHku4dQGFlk",
+  authDomain: "inter-manila.firebaseapp.com",
+  projectId: "inter-manila",
+  storageBucket: "inter-manila.firebasestorage.app",
+  messagingSenderId: "285507279342",
+  appId: "1:285507279342:web:5aa0c80a08fb92727416ff"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+/* Proteksi halaman */
+onAuthStateChanged(auth, (user) => {
+  if (!user) window.location.href="index.html";
+});
+
+/* Load all leagues */
+async function loadLeagues(){
+  const snapshot = await getDocs(collection(db,"leagues"));
+  let html="";
+  snapshot.forEach(docSnap=>{
+    let data = docSnap.data();
+    html+=`
+      <div class="league">
+        <span>${data.name}</span>
+        <div>
+          <button onclick="editLeague('${docSnap.id}','${data.name}')">Edit</button>
+          <button onclick="deleteLeague('${docSnap.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById("leagueList").innerHTML = html;
+}
+
+loadLeagues();
+
+/* Add new league */
+window.addLeague = async function(){
+  let name = document.getElementById("leagueName").value.trim();
+  if(!name) return alert("Isi nama liga");
+
+  await addDoc(collection(db,"leagues"),{ name });
+  document.getElementById("leagueName").value="";
+  loadLeagues();
+};
+
+/* Delete league */
+window.deleteLeague = async function(id){
+  if(confirm("Yakin ingin hapus liga ini?")){
+    await deleteDoc(doc(db,"leagues",id));
+    loadLeagues();
+  }
+};
+
+/* Edit league */
+window.editLeague = async function(id, oldName){
+  let newName = prompt("Ubah nama liga:", oldName);
+  if(newName && newName.trim() !== ""){
+    await updateDoc(doc(db,"leagues",id), { name: newName.trim() });
+    loadLeagues();
+  }
+};
+
+</script>
+
+</body>
+</html>
