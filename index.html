@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inter Manila Squad</title><style>
+<title>Inter Manila Club Manager</title><style>
 body{
     margin:0;
     font-family:Arial, Helvetica, sans-serif;
@@ -12,7 +12,7 @@ body{
 
 header{
     background:#0e1b3a;
-    padding:20px;
+    padding:18px;
     text-align:center;
     border-bottom:2px solid #1e3cff;
 }
@@ -23,6 +23,42 @@ header{
     padding:20px;
 }
 
+/* FORM */
+.form{
+    background:#121a33;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:25px;
+    border:1px solid #1e3cff;
+}
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    border-radius:8px;
+    border:none;
+    background:#0b1024;
+    color:white;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:12px;
+    border:none;
+    border-radius:10px;
+    background:#1e3cff;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#3d5bff;
+}
+
+/* PLAYER CARD */
 .player{
     background:#121a33;
     border-radius:12px;
@@ -32,7 +68,7 @@ header{
 }
 
 .name{
-    font-size:20px;
+    font-size:18px;
     font-weight:bold;
 }
 
@@ -46,19 +82,51 @@ header{
     opacity:.9;
 }
 
-#loading{
-    text-align:center;
-    margin-top:30px;
+/* LEADERBOARD */
+.board{
+    background:#121a33;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:20px;
+    border:1px solid gold;
+}
+
+.board h3{
+    margin-top:0;
+    color:gold;
 }
 </style></head><body><header>
-<h1>INTER MANILA — FIRST TEAM</h1>
-</header><div class="container">
-<div id="loading">Loading players...</div>
-<div id="players"></div>
-</div><script type="module">
+<h1>INTER MANILA — CLUB MANAGER</h1>
+</header><div class="container"><!-- ADD PLAYER --><div class="form">
+<h2>Add Player</h2><input id="name" placeholder="Player Name">
+<input id="number" type="number" placeholder="Squad Number"><select id="pos">
+<option>GK</option>
+<option>CB</option>
+<option>LB</option>
+<option>RB</option>
+<option>DMF</option>
+<option>CMF</option>
+<option>AMF</option>
+<option>LWF</option>
+<option>RWF</option>
+<option>SS</option>
+<option>CF</option>
+</select><button onclick="addPlayer()">Add Player</button>
+
+</div><!-- LEADERBOARDS --><div class="board">
+<h3>🏆 Top Scorer</h3>
+<div id="topGoals">-</div>
+</div><div class="board">
+<h3>🎯 Top Assist</h3>
+<div id="topAssist">-</div>
+</div><div class="board">
+<h3>🧤 Most Saves (GK)</h3>
+<div id="topSaves">-</div>
+</div><h2>⚽ Inter Manila Squad</h2>
+<div id="players"></div></div><script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAuqUcXYjMU-XaL_w7h4y43RHku4dQGFlk",
@@ -72,36 +140,67 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+window.addPlayer = async function(){
+
+let name=document.getElementById("name").value;
+let number=document.getElementById("number").value;
+let pos=document.getElementById("pos").value;
+
+if(!name || !number){
+alert("Isi dulu!");
+return;
+}
+
+await addDoc(collection(db,"players"),{
+name,
+number,
+pos,
+goals:0,
+assist:0,
+saves:0,
+match:0
+});
+
+loadPlayers();
+};
+
 async function loadPlayers(){
-    const loading = document.getElementById("loading");
-    const playersDiv = document.getElementById("players");
+const querySnapshot = await getDocs(collection(db,"players"));
+let html="";
 
-    try{
-        const querySnapshot = await getDocs(collection(db,"players"));
-        let html="";
+let players=[];
 
-        querySnapshot.forEach((doc)=>{
-            const p = doc.data();
+querySnapshot.forEach((doc)=>{
+players.push(doc.data());
+});
 
-            html += `
-            <div class="player">
-                <div class="name">#${p.number} ${p.name}</div>
-                <div class="pos">${p.pos} | OVR ${p.ovr}</div>
-                <div class="stats">
-                    Goals: ${p.goals} |
-                    Assist: ${p.assist} |
-                    Match: ${p.match}
-                </div>
-            </div>`;
-        });
+players.forEach(p=>{
+html+=`
+<div class="player">
+<div class="name">#${p.number} ${p.name}</div>
+<div class="pos">${p.pos}</div>
+<div class="stats">
+Goals: ${p.goals} | Assist: ${p.assist} | Saves: ${p.saves} | Match: ${p.match}
+</div>
+</div>`;
+});
 
-        loading.style.display="none";
-        playersDiv.innerHTML = html;
+document.getElementById("players").innerHTML=html;
 
-    }catch(e){
-        loading.innerText = "Firestore belum diizinkan (rules masih private)";
-        console.error(e);
-    }
+/* LEADERBOARDS */
+
+players.sort((a,b)=>b.goals-a.goals);
+document.getElementById("topGoals").innerText =
+players[0] ? players[0].name+" ("+players[0].goals+")" : "-";
+
+players.sort((a,b)=>b.assist-a.assist);
+document.getElementById("topAssist").innerText =
+players[0] ? players[0].name+" ("+players[0].assist+")" : "-";
+
+let gk = players.filter(p=>p.pos=="GK");
+gk.sort((a,b)=>b.saves-a.saves);
+document.getElementById("topSaves").innerText =
+gk[0] ? gk[0].name+" ("+gk[0].saves+")" : "-";
 }
 
 loadPlayers();
