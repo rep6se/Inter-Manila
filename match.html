@@ -3,111 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Match — Inter Manila</title>
-
+<title>Matches — Inter Manila</title>
 <style>
 body{
-margin:0;
-font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-background: linear-gradient(135deg,#0f172a,#020617);
-color:white;
-text-align:center;
+  margin:0;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background:#0f172a;
+  color:#f1f5f9;
 }
-
 .header{
-background:#020617;
-padding:18px;
-font-size:22px;
-font-weight:bold;
-border-bottom:2px solid #1e293b;
+  background:#020617;
+  padding:18px;
+  font-size:24px;
+  font-weight:bold;
+  text-align:center;
+  border-bottom:2px solid #334155;
 }
-
 .container{
-padding:25px;
-max-width:500px;
-margin:auto;
+  padding:20px;
+  max-width:700px;
+  margin:auto;
 }
-
 input, select{
-width:100%;
-padding:12px;
-margin:10px 0;
-border:none;
-border-radius:10px;
-background:#1e293b;
-color:white;
-font-size:14px;
+  width:100%;
+  padding:10px;
+  margin:6px 0 12px 0;
+  border-radius:8px;
+  border:none;
+  background:#1e293b;
+  color:white;
+  font-size:14px;
 }
-
 button{
-width:100%;
-padding:14px;
-margin-top:12px;
-border:none;
-border-radius:12px;
-background:#2563eb;
-color:white;
-font-weight:bold;
-font-size:15px;
-cursor:pointer;
-transition:0.2s;
+  width:100%;
+  padding:14px;
+  font-weight:bold;
+  border:none;
+  border-radius:10px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+  margin-top:10px;
+  transition:0.2s;
 }
-
 button:hover{
-background:#1d4ed8;
-transform:scale(1.03);
+  background:#1d4ed8;
 }
-
-.player{
-background:#1e293b;
-padding:12px;
-border-radius:12px;
-margin-top:10px;
-text-align:left;
+.match-card{
+  background:#1e293b;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:12px;
 }
-
-.hr{
-border-color:#334155;
-}
-
 .back{
-margin-top:20px;
-display:block;
-text-align:center;
-color:#93c5fd;
-text-decoration:none;
+  margin-top:20px;
+  display:block;
+  text-align:center;
+  color:#93c5fd;
+  text-decoration:none;
+}
+.player-stats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.player-stats input{
+  flex:1;
+  min-width:60px;
 }
 </style>
 </head>
-
 <body>
 
-<div class="header">INTER MANILA — MATCH INPUT</div>
+<div class="header">Matches — Inter Manila</div>
 
 <div class="container">
 
-<h3>New Match</h3>
+<label for="league">League</label>
+<select id="leagueSelect"></select>
 
-<select id="liga">
-<option value="">Loading leagues...</option>
-</select>
+<label for="scoreFor">Inter Manila Score</label>
+<input type="number" id="scoreFor" min="0" value="0">
 
-<input type="number" id="score_for" placeholder="Our Score">
-<input type="number" id="score_against" placeholder="Opponent Score">
+<label for="scoreAgainst">Opponent Score</label>
+<input type="number" id="scoreAgainst" min="0" value="0">
 
-<h4>Players Stats</h4>
-<div id="playersList">Loading players...</div>
+<h3>Player Stats</h3>
+<div id="playerStatsContainer">Loading players...</div>
 
-<button onclick="submitMatch()">Submit Match</button>
+<button onclick="addMatch()">Add Match</button>
 
-<a class="back" href="dashboard.html">← Back to Menu</a>
+<a class="back" href="dashboard.html">← Back to Dashboard</a>
 
+<div id="message"></div>
 </div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
@@ -123,86 +116,86 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* Proteksi halaman */
-onAuthStateChanged(auth, (user) => {
-  if (!user) window.location.href="index.html";
+/* Protect page */
+onAuthStateChanged(auth,(user)=>{
+  if(!user) window.location.href="index.html";
 });
 
-/* Load semua liga */
-async function loadLeagues() {
+/* Load leagues */
+async function loadLeagues(){
   const leagueSnap = await getDocs(collection(db,"leagues"));
-  let html = '<option value="">Select League</option>';
-  leagueSnap.forEach(docSnap => {
+  let html="";
+  leagueSnap.forEach(docSnap=>{
     html += `<option value="${docSnap.data().name}">${docSnap.data().name}</option>`;
   });
-  document.getElementById("liga").innerHTML = html;
+  document.getElementById("leagueSelect").innerHTML = html;
 }
 loadLeagues();
 
-/* Load semua pemain */
+/* Load players */
+let playersList = [];
 async function loadPlayers(){
-  const querySnapshot = await getDocs(collection(db,"players"));
+  const snapshot = await getDocs(collection(db,"players"));
+  playersList = [];
   let html="";
-
-  querySnapshot.forEach((docSnap)=>{
-    let p = docSnap.data();
+  snapshot.forEach(docSnap=>{
+    const p = docSnap.data();
+    playersList.push({id: docSnap.id, name:p.name});
     html+=`
-      <div class="player">
-        <b>#${p.number} ${p.name}</b> (${p.pos})<br>
-        Goals: <input type="number" min="0" value="0" id="g_${docSnap.id}">
-        Assist: <input type="number" min="0" value="0" id="a_${docSnap.id}">
-        Saves: <input type="number" min="0" value="0" id="s_${docSnap.id}">
+      <div class="player-stats">
+        <div style="flex:2">${p.name}</div>
+        <input type="number" placeholder="Goals" id="g_${docSnap.id}" min="0" value="0">
+        <input type="number" placeholder="Assist" id="a_${docSnap.id}" min="0" value="0">
+        <input type="number" placeholder="Saves" id="s_${docSnap.id}" min="0" value="0">
       </div>
-      <hr class="hr">
     `;
   });
-
-  document.getElementById("playersList").innerHTML = html;
+  document.getElementById("playerStatsContainer").innerHTML = html;
 }
-
 loadPlayers();
 
-/* Submit match dan update stats */
-window.submitMatch = async function(){
-  const liga = document.getElementById("liga").value;
-  const score_for = parseInt(document.getElementById("score_for").value);
-  const score_against = parseInt(document.getElementById("score_against").value);
+/* Add Match */
+window.addMatch = async function(){
+  const league = document.getElementById("leagueSelect").value;
+  const scoreFor = parseInt(document.getElementById("scoreFor").value)||0;
+  const scoreAgainst = parseInt(document.getElementById("scoreAgainst").value)||0;
 
-  if(!liga || isNaN(score_for) || isNaN(score_against)){
-    return alert("Isi semua field liga dan skor");
+  const playerStats=[];
+  for(const p of playersList){
+    const goals = parseInt(document.getElementById(`g_${p.id}`).value)||0;
+    const assist = parseInt(document.getElementById(`a_${p.id}`).value)||0;
+    const saves = parseInt(document.getElementById(`s_${p.id}`).value)||0;
+
+    playerStats.push({id:p.id, goals, assist, saves});
+
+    // update player stats total
+    const playerRef = doc(db,"players",p.id);
+    const playerSnap = await getDocs(collection(db,"players"));
+    const playerDoc = await playerRef.get();
+    const data = playerDoc.data();
+    await updateDoc(playerRef,{
+      goals: Number(data.goals||0)+goals,
+      assist: Number(data.assist||0)+assist,
+      saves: Number(data.saves||0)+saves,
+      match: Number(data.match||0)+1,
+      leagues: Array.isArray(data.leagues) 
+                ? (data.leagues.includes(league) ? data.leagues : [...data.leagues,league])
+                : [league]
+    });
   }
 
-  // Simpan match ke Firestore
+  // Add match document
   await addDoc(collection(db,"matches"),{
-    liga,
-    score_for,
-    score_against,
-    date: new Date().toISOString()
+    liga: league,
+    score_for: scoreFor,
+    score_against: scoreAgainst,
+    date: new Date(),
+    players: playerStats
   });
 
-  // Update stats pemain
-  const playersSnap = await getDocs(collection(db,"players"));
-  playersSnap.forEach(async (docSnap)=>{
-    const docRef = doc(db,"players",docSnap.id);
-    const data = docSnap.data();
-
-    const goals = parseInt(document.getElementById(`g_${docSnap.id}`).value);
-    const assist = parseInt(document.getElementById(`a_${docSnap.id}`).value);
-    const saves = parseInt(document.getElementById(`s_${docSnap.id}`).value);
-
-    await updateDoc(docRef,{
-      goals: data.goals + goals,
-      assist: data.assist + assist,
-      saves: data.saves + saves,
-      match: data.match + 1
-    });
-  });
-
-  alert("Match saved!");
-  window.location.reload();
-};
-
+  document.getElementById("message").innerText="Match added successfully!";
+  loadPlayers(); // reset inputs
+}
 </script>
-
 </body>
 </html>
