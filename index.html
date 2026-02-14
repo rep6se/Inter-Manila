@@ -1,40 +1,134 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Inter Manila Club Manager</title>
-
-<style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inter Manila Squad</title><style>
 body{
-font-family:Arial;
-background:#0f172a;
-color:white;
-padding:20px;
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+    background:#0b0f1a;
+    color:white;
 }
 
-h1{
-text-align:center;
+/* HEADER */
+header{
+    background:linear-gradient(90deg,#0e1b3a,#081027);
+    padding:20px;
+    text-align:center;
+    border-bottom:2px solid #1e3cff;
+}
+header h1{
+    margin:0;
+    font-size:28px;
+    letter-spacing:2px;
 }
 
-.card{
-background:#1e293b;
-padding:15px;
-border-radius:12px;
-margin-bottom:12px;
+/* CONTAINER */
+.container{
+    max-width:900px;
+    margin:30px auto;
+    padding:20px;
 }
 
-input,select{
-width:100%;
-padding:10px;
-margin:6px 0;
-border-radius:8px;
-border:none;
+/* PLAYER CARD */
+.player{
+    background:#121a33;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:15px;
+    box-shadow:0 0 10px rgba(0,0,0,.4);
+    border:1px solid #1e3cff;
+    transition:.2s;
+}
+.player:hover{
+    transform:scale(1.02);
+    box-shadow:0 0 15px rgba(30,60,255,.5);
 }
 
-button{
-background:#22c55e;
-color:white;
-padding:12px;
+.name{
+    font-size:20px;
+    font-weight:bold;
+}
+
+.pos{
+    color:#8fa6ff;
+    margin-bottom:6px;
+}
+
+.stats{
+    margin-top:8px;
+    font-size:14px;
+    opacity:.9;
+}
+
+/* LOADING */
+#loading{
+    text-align:center;
+    margin-top:40px;
+    font-size:18px;
+    opacity:.7;
+}
+</style></head><body><header>
+<h1>INTER MANILA — FIRST TEAM</h1>
+</header><div class="container">
+<div id="loading">Loading players...</div>
+<div id="players"></div>
+</div><script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* FIREBASE CONFIG (PUNYAMU) */
+const firebaseConfig = {
+  apiKey: "AIzaSyAuqUcXYjMU-XaL_w7h4y43RHku4dQGFlk",
+  authDomain: "inter-manila.firebaseapp.com",
+  projectId: "inter-manila",
+  storageBucket: "inter-manila.firebasestorage.app",
+  messagingSenderId: "285507279342",
+  appId: "1:285507279342:web:5aa0c80a08fb92727416ff",
+  measurementId: "G-L5W5VL3JNG"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* LOAD PLAYERS */
+async function loadPlayers(){
+    const playersDiv = document.getElementById("players");
+    const loading = document.getElementById("loading");
+
+    try{
+        const querySnapshot = await getDocs(collection(db,"players"));
+        let html="";
+
+        querySnapshot.forEach((doc)=>{
+            const p = doc.data();
+
+            html += `
+            <div class="player">
+                <div class="name">#${p.number} ${p.name}</div>
+                <div class="pos">${p.pos} | OVR ${p.ovr}</div>
+                <div class="stats">
+                    Goals: ${p.goals} |
+                    Assist: ${p.assist} |
+                    Match: ${p.match}
+                </div>
+            </div>`;
+        });
+
+        loading.style.display="none";
+        playersDiv.innerHTML=html;
+
+    }catch(err){
+        loading.innerText="❌ Failed to load players (Firestore belum public)";
+        console.error(err);
+    }
+}
+
+loadPlayers();
+
+</script></body>
+</html>padding:12px;
 border:none;
 border-radius:10px;
 margin-top:8px;
