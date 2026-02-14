@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match — Inter Manila</title>
+
+<style>
+body{
+margin:0;
+font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background: linear-gradient(135deg,#0f172a,#020617);
+color:white;
+text-align:center;
+}
+
+.header{
+background:#020617;
+padding:18px;
+font-size:22px;
+font-weight:bold;
+border-bottom:2px solid #1e293b;
+}
+
+.container{
+padding:25px;
+max-width:500px;
+margin:auto;
+}
+
+input, select{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:none;
+border-radius:10px;
+background:#1e293b;
+color:white;
+font-size:14px;
+}
+
+button{
+width:100%;
+padding:14px;
+margin-top:12px;
+border:none;
+border-radius:12px;
+background:#2563eb;
+color:white;
+font-weight:bold;
+font-size:15px;
+cursor:pointer;
+transition:0.2s;
+}
+
+button:hover{
+background:#1d4ed8;
+transform:scale(1.03);
+}
+
+.back{
+margin-top:20px;
+display:block;
+text-align:center;
+color:#93c5fd;
+text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">INTER MANILA — MATCH INPUT</div>
+
+<div class="container">
+
+<h3>New Match</h3>
+
+<select id="liga">
+<option value="">Select League</option>
+<option value="UEL">UEL</option>
+<option value="Elite">Elite</option>
+<option value="PTL">PTL</option>
+<option value="USL">USL</option>
+</select>
+
+<input type="number" id="score_for" placeholder="Our Score">
+<input type="number" id="score_against" placeholder="Opponent Score">
+
+<h4>Players Stats</h4>
+<div id="playersList">Loading players...</div>
+
+<button onclick="submitMatch()">Submit Match</button>
+
+<a class="back" href="dashboard.html">← Back to Menu</a>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuqUcXYjMU-XaL_w7h4y43RHku4dQGFlk",
+  authDomain: "inter-manila.firebaseapp.com",
+  projectId: "inter-manila",
+  storageBucket: "inter-manila.firebasestorage.app",
+  messagingSenderId: "285507279342",
+  appId: "1:285507279342:web:5aa0c80a08fb92727416ff"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+/* Proteksi halaman */
+onAuthStateChanged(auth, (user) => {
+  if (!user) window.location.href="index.html";
+});
+
+/* Load players untuk input stats */
+async function loadPlayers(){
+  const querySnapshot = await getDocs(collection(db,"players"));
+  let html="";
+  querySnapshot.forEach((doc)=>{
+    let p = doc.data();
+    html+=`
+      <div>
+        <b>#${p.number} ${p.name}</b><br>
+        Goals: <input type="number" min="0" value="0" id="g_${doc.id}">
+        Assist: <input type="number" min="0" value="0" id="a_${doc.id}">
+        Saves: <input type="number" min="0" value="0" id="s_${doc.id}">
+      </div>
+      <hr style="border-color:#334155;">
+    `;
+  });
+  document.getElementById("playersList").innerHTML = html;
+}
+
+loadPlayers();
+
+/* Submit match */
+window.submitMatch = async function(){
+  const liga = document.getElementById("liga").value;
+  const score_for = parseInt(document.getElementById("score_for").value);
+  const score_against = parseInt(document.getElementById("score_against").value);
+
+  if(!liga || isNaN(score_for) || isNaN(score_against)){
+    return alert("Isi semua field liga dan skor");
+  }
+
+  // Simpan match ke Firestore
+  await addDoc(collection(db,"matches"),{
+    liga,
+    score_for,
+    score_against,
+    date: new Date().toISOString()
+  });
+
+  // Update stats pemain
+  const playersSnap = await getDocs(collection(db,"players"));
+  playersSnap.forEach(async (docSnap)=>{
+    const docRef = doc(db,"players",docSnap.id);
+    const data = docSnap.data();
+
+    const goals = parseInt(document.getElementById(`g_${docSnap.id}`).value);
+    const assist = parseInt(document.getElementById(`a_${docSnap.id}`).value);
+    const saves = parseInt(document.getElementById(`s_${docSnap.id}`).value);
+
+    await updateDoc(docRef,{
+      goals: data.goals + goals,
+      assist: data.assist + assist,
+      saves: data.saves + saves,
+      match: data.match + 1
+    });
+  });
+
+  alert("Match saved!");
+  window.location.reload();
+};
+
+</script>
+
+</body>
+</html>
