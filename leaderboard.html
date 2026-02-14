@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard — Inter Manila</title>
-
 <style>
 body{
   margin:0;
@@ -12,7 +11,6 @@ body{
   background:#0f172a;
   color:#f1f5f9;
 }
-
 .header{
   background:#020617;
   padding:18px;
@@ -21,13 +19,11 @@ body{
   text-align:center;
   border-bottom:2px solid #334155;
 }
-
 .container{
   padding:20px;
-  max-width:500px;
+  max-width:600px;
   margin:auto;
 }
-
 select{
   width:100%;
   padding:10px;
@@ -38,7 +34,6 @@ select{
   color:white;
   font-size:14px;
 }
-
 .player-card{
   background:#1e293b;
   padding:12px 15px;
@@ -49,15 +44,12 @@ select{
   align-items:center;
   transition:0.2s;
 }
-
 .player-card:hover{
   background:#2563eb;
 }
-
 .player-info{
   text-align:left;
 }
-
 .back{
   margin-top:20px;
   display:block;
@@ -67,14 +59,17 @@ select{
 }
 </style>
 </head>
-
 <body>
 
 <div class="header">Inter Manila — Leaderboard</div>
 
 <div class="container">
 
-<select id="category" onchange="loadLeaderboard()">
+<select id="leagueSelect" onchange="loadLeaderboard()">
+  <option value="all">All Leagues</option>
+</select>
+
+<select id="categorySelect" onchange="loadLeaderboard()">
   <option value="goals">Most Goals</option>
   <option value="assist">Most Assists</option>
   <option value="saves">Most Saves</option>
@@ -107,26 +102,78 @@ const auth = getAuth(app);
 
 /* Protect page */
 onAuthStateChanged(auth, (user) => {
-  if (!user) window.location.href="index.html";
+  if(!user) window.location.href="index.html";
 });
+
+/* Load league dropdown dynamically */
+async function loadLeagues(){
+  const leagueSnap = await getDocs(collection(db,"leagues"));
+  let html = '<option value="all">All Leagues</option>';
+  leagueSnap.forEach(docSnap=>{
+    html += `<option value="${docSnap.data().name}">${docSnap.data().name}</option>`;
+  });
+  document.getElementById("leagueSelect").innerHTML = html;
+}
+loadLeagues();
 
 /* Load leaderboard */
 async function loadLeaderboard(){
-  const category = document.getElementById("category").value;
-  const snapshot = await getDocs(collection(db,"players"));
+  const league = document.getElementById("leagueSelect").value;
+  const category = document.getElementById("categorySelect").value;
 
-  let players = [];
-  snapshot.forEach(docSnap=>{
+  const playersSnap = await getDocs(collection(db,"players"));
+  let leaderboard = [];
+
+  // Copy all players
+  playersSnap.forEach(docSnap=>{
     let p = docSnap.data();
     p.id = docSnap.id;
-    players.push(p);
+    leaderboard.push({
+      name: p.name,
+      pos: p.pos,
+      goals: Number(p.goals) || 0,
+      assist: Number(p.assist) || 0,
+      saves: Number(p.saves) || 0,
+      match: Number(p.match) || 0
+    });
   });
 
-  // Numeric sort descending
-  players.sort((a,b)=> Number(b[category]) - Number(a[category]));
+  // If specific league selected, filter by matches in that league
+  if(league !== "all"){
+    const matchesSnap = await getDocs(collection(db,"matches"));
+    let playerStats = {};
+    matchesSnap.forEach(docSnap=>{
+      const match = docSnap.data();
+      if(match.liga !== league) return;
+      const stats = match.players; // array of {id, goals, assist, saves}
+      stats?.forEach(s=>{
+        if(!playerStats[s.id]) playerStats[s.id]={goals:0,assist:0,saves:0,match:0,name:"",pos:""};
+        playerStats[s.id].goals += Number(s.goals)||0;
+        playerStats[s.id].assist += Number(s.assist)||0;
+        playerStats[s.id].saves += Number(s.saves)||0;
+        playerStats[s.id].match +=1;
+      });
+    });
 
+    // Merge names/pos from players collection
+    leaderboard.forEach(p=>{
+      if(playerStats[p.id]){
+        p.goals = playerStats[p.id].goals;
+        p.assist = playerStats[p.id].assist;
+        p.saves = playerStats[p.id].saves;
+        p.match = playerStats[p.id].match;
+      } else {
+        p.goals=0; p.assist=0; p.saves=0; p.match=0;
+      }
+    });
+  }
+
+  // Sort descending
+  leaderboard.sort((a,b)=> (Number(b[category])||0) - (Number(a[category])||0));
+
+  // Render
   let html="";
-  players.forEach((p,index)=>{
+  leaderboard.forEach((p,index)=>{
     html+=`
       <div class="player-card">
         <div class="player-info">
@@ -146,6 +193,5 @@ async function loadLeaderboard(){
 loadLeaderboard();
 
 </script>
-
 </body>
 </html>
