@@ -1,0 +1,57 @@
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuqUcXYjMU-XaL_w7h4y43RHku4dQGFlk",
+  authDomain: "inter-manila.firebaseapp.com",
+  projectId: "inter-manila",
+  storageBucket: "inter-manila.firebasestorage.app",
+  messagingSenderId: "285507279342",
+  appId: "1:285507279342:web:5aa0c80a08fb92727416ff"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.addPlayer = async function(){
+
+let name=document.getElementById("name").value;
+let number=document.getElementById("number").value;
+let pos=document.getElementById("pos").value;
+let ovr=document.getElementById("ovr").value;
+
+await addDoc(collection(db,"players"),{
+name,
+number,
+pos,
+ovr,
+goals:0,
+assist:0,
+match:0
+});
+
+loadPlayers();
+};
+
+async function loadPlayers(){
+const querySnapshot = await getDocs(collection(db,"players"));
+let html="";
+
+querySnapshot.forEach((doc)=>{
+let p=doc.data();
+html+=`
+<div class="player">
+<b>#${p.number} ${p.name}</b><br>
+${p.pos} | OVR ${p.ovr}<br>
+Goals: ${p.goals} | Assist: ${p.assist} | Match: ${p.match}
+</div>`;
+});
+
+document.getElementById("players").innerHTML=html;
+}
+
+loadPlayers();
+
+</script>
