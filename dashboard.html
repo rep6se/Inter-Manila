@@ -5,67 +5,99 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inter Manila — Dashboard</title>
 <style>
-body{
-  margin:0;
-  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background:#0f172a;
-  color:#f1f5f9;
-}
-.header{
-  background:#020617;
-  padding:20px;
-  font-size:26px;
-  font-weight:bold;
-  text-align:center;
-  border-bottom:2px solid #334155;
-}
-.container{
-  max-width:600px;
-  margin:auto;
-  padding:20px;
-}
-.menu-button{
-  width:100%;
-  padding:16px;
-  margin-bottom:12px;
-  font-size:18px;
-  font-weight:bold;
-  border:none;
-  border-radius:10px;
-  background:#1e293b;
-  color:white;
-  cursor:pointer;
-  transition:0.2s;
-}
-.menu-button:hover{
-  background:#2563eb;
-}
-.logout{
-  margin-top:20px;
-  display:block;
-  text-align:center;
-  color:#f87171;
-  text-decoration:none;
-}
+body{margin:0;font-family:'Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#f1f5f9;}
+.header{background:#020617;padding:18px;font-size:24px;font-weight:bold;text-align:center;border-bottom:2px solid #334155;}
+.nav{display:flex;gap:6px;flex-wrap:wrap;padding:12px;justify-content:center;}
+.nav button{flex:1;min-width:120px;padding:12px;border:none;border-radius:8px;background:#2563eb;color:white;font-weight:bold;cursor:pointer;transition:0.2s;}
+.nav button:hover{background:#1d4ed8;}
+.container{max-width:900px;margin:auto;padding:20px;}
+.panel{display:none;}
+input,select{width:100%;padding:10px;margin:6px 0 12px 0;border-radius:8px;border:none;background:#1e293b;color:white;font-size:14px;}
+button.action{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:none;background:#2563eb;color:white;font-weight:bold;cursor:pointer;transition:0.2s;}
+button.action:hover{background:#1d4ed8;}
+.delete-btn{background:#ef4444;}
+.delete-btn:hover{background:#dc2626;}
+.card{background:#1e293b;padding:12px;border-radius:10px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.card input{flex:1;margin-right:8px;}
+.player-stats{display:flex;gap:8px;flex-wrap:wrap;}
+.player-stats input{flex:1;min-width:60px;}
+.back{margin-top:20px;display:block;text-align:center;color:#93c5fd;text-decoration:none;}
 </style>
 </head>
 <body>
-
 <div class="header">Inter Manila — Dashboard</div>
 
-<div class="container">
-  <button class="menu-button" onclick="navigate('squad.html')">Squad</button>
-  <button class="menu-button" onclick="navigate('match.html')">Matches</button>
-  <button class="menu-button" onclick="navigate('leagues.html')">Leagues</button>
-  <button class="menu-button" onclick="navigate('leaderboard.html')">Leaderboard</button>
+<div class="nav">
+  <button onclick="showPanel('squad')">Squad</button>
+  <button onclick="showPanel('matches')">Matches</button>
+  <button onclick="showPanel('leagues')">Leagues</button>
+  <button onclick="showPanel('leaderboard')">Leaderboard</button>
+</div>
 
-  <a href="#" class="logout" onclick="logout()">Logout</a>
+<div class="container">
+
+<!-- Squad Panel -->
+<div id="squad" class="panel">
+<h2>Squad</h2>
+<input type="text" id="playerName" placeholder="Player Name">
+<input type="number" id="playerNumber" placeholder="Number" min="0">
+<select id="playerPos">
+  <option value="GK">GK</option>
+  <option value="DEF">DEF</option>
+  <option value="MID">MID</option>
+  <option value="FWD">FWD</option>
+</select>
+<button class="action" onclick="addPlayer()">Add Player</button>
+<div id="playersList">Loading players...</div>
+</div>
+
+<!-- Matches Panel -->
+<div id="matches" class="panel">
+<h2>Matches</h2>
+<label>League</label>
+<select id="matchLeague"></select>
+<label>Inter Manila Score</label>
+<input type="number" id="scoreFor" min="0" value="0">
+<label>Opponent Score</label>
+<input type="number" id="scoreAgainst" min="0" value="0">
+<h3>Player Stats</h3>
+<div id="playerStatsContainer">Loading players...</div>
+<button class="action" onclick="addMatch()">Add Match</button>
+<div id="matchMsg"></div>
+</div>
+
+<!-- Leagues Panel -->
+<div id="leagues" class="panel">
+<h2>Leagues</h2>
+<input type="text" id="newLeague" placeholder="New League Name">
+<button class="action" onclick="addLeague()">Add League</button>
+<div id="leaguesList">Loading leagues...</div>
+</div>
+
+<!-- Leaderboard Panel -->
+<div id="leaderboard" class="panel">
+<h2>Leaderboard</h2>
+<label>Select League</label>
+<select id="leaderboardLeague" onchange="loadLeaderboard()">
+  <option value="all">All Leagues</option>
+</select>
+<label>Select Category</label>
+<select id="leaderboardCategory" onchange="loadLeaderboard()">
+  <option value="goals">Most Goals</option>
+  <option value="assist">Most Assists</option>
+  <option value="saves">Most Saves</option>
+</select>
+<div id="leaderboardList">Loading leaderboard...</div>
+</div>
+
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAuqUcXYjMU-XaL_w7h4y43RHku4dQGFlk",
   authDomain: "inter-manila.firebaseapp.com",
@@ -74,26 +106,194 @@ const firebaseConfig = {
   messagingSenderId: "285507279342",
   appId: "1:285507279342:web:5aa0c80a08fb92727416ff"
 };
-
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Protect page
-onAuthStateChanged(auth, (user)=>{
+// --- LOGIN PROTECT ---
+onAuthStateChanged(auth,(user)=>{
   if(!user) window.location.href="index.html";
 });
 
-// Navigate function
-function navigate(url){
-  window.location.href = url;
+// --- PANEL NAVIGATION ---
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.style.display='none');
+  document.getElementById(id).style.display='block';
 }
+// default show squad
+showPanel('squad');
 
-// Logout function
-window.logout = async function(){
-  await signOut(auth);
-  window.location.href="index.html";
+// --- SQUAD ---
+let playersList = [];
+async function loadPlayers(){
+  const snapshot = await getDocs(collection(db,"players"));
+  playersList=[];
+  let html="";
+  snapshot.forEach(docSnap=>{
+    const p = docSnap.data();
+    playersList.push({id:docSnap.id,name:p.name});
+    html+=`
+      <div class="card">
+        <div>${p.name} (#${p.number}) | ${p.pos} | G:${p.goals} A:${p.assist} S:${p.saves}</div>
+        <button class="delete-btn" onclick="deletePlayer('${docSnap.id}')">Delete</button>
+      </div>
+    `;
+  });
+  document.getElementById("playersList").innerHTML=html;
 }
+async function addPlayer(){
+  const name = document.getElementById("playerName").value.trim();
+  const number = Number(document.getElementById("playerNumber").value);
+  const pos = document.getElementById("playerPos").value;
+  if(!name || !number) return alert("Enter name & number");
+  await addDoc(collection(db,"players"),{
+    name, number, pos, goals:0, assist:0, saves:0, match:0, leagues:[]
+  });
+  document.getElementById("playerName").value="";
+  document.getElementById("playerNumber").value="";
+  loadPlayers();
+  loadPlayersForMatches();
+}
+async function deletePlayer(id){
+  if(!confirm("Delete this player?")) return;
+  await deleteDoc(doc(db,"players",id));
+  loadPlayers();
+  loadPlayersForMatches();
+}
+loadPlayers();
+
+// --- MATCHES ---
+async function loadPlayersForMatches(){
+  const snapshot = await getDocs(collection(db,"players"));
+  playersList=[];
+  let html="";
+  snapshot.forEach(docSnap=>{
+    const p = docSnap.data();
+    playersList.push({id:docSnap.id,name:p.name});
+    html+=`
+      <div class="player-stats">
+        <div style="flex:2">${p.name}</div>
+        <input type="number" id="g_${docSnap.id}" placeholder="Goals" min="0" value="0">
+        <input type="number" id="a_${docSnap.id}" placeholder="Assist" min="0" value="0">
+        <input type="number" id="s_${docSnap.id}" placeholder="Saves" min="0" value="0">
+      </div>
+    `;
+  });
+  document.getElementById("playerStatsContainer").innerHTML=html;
+}
+async function loadLeaguesForMatches(){
+  const snapshot = await getDocs(collection(db,"leagues"));
+  let html="";
+  snapshot.forEach(docSnap=>{
+    html+=`<option value="${docSnap.data().name}">${docSnap.data().name}</option>`;
+  });
+  document.getElementById("matchLeague").innerHTML=html;
+}
+async function addMatch(){
+  const league = document.getElementById("matchLeague").value;
+  const scoreFor = Number(document.getElementById("scoreFor").value)||0;
+  const scoreAgainst = Number(document.getElementById("scoreAgainst").value)||0;
+  const playerStats=[];
+  for(const p of playersList){
+    const goals=Number(document.getElementById(`g_${p.id}`).value)||0;
+    const assist=Number(document.getElementById(`a_${p.id}`).value)||0;
+    const saves=Number(document.getElementById(`s_${p.id}`).value)||0;
+    playerStats.push({id:p.id,goals,assist,saves});
+    const pRef = doc(db,"players",p.id);
+    const snap = await getDocs(collection(db,"players"));
+    const docSnap = await pRef.get?.();
+    const data = docSnap ? docSnap.data() : {goals:0,assist:0,saves:0,match:0,leagues:[]};
+    await updateDoc(pRef,{
+      goals:(data.goals||0)+goals,
+      assist:(data.assist||0)+assist,
+      saves:(data.saves||0)+saves,
+      match:(data.match||0)+1,
+      leagues: Array.isArray(data.leagues) 
+                ? (data.leagues.includes(league) ? data.leagues : [...data.leagues,league])
+                : [league]
+    });
+  }
+  await addDoc(collection(db,"matches"),{
+    league, scoreFor, scoreAgainst, date:new Date(), players:playerStats
+  });
+  document.getElementById("scoreFor").value=0;
+  document.getElementById("scoreAgainst").value=0;
+  loadPlayersForMatches();
+  document.getElementById("matchMsg").innerText="Match added!";
+}
+loadPlayersForMatches();
+loadLeaguesForMatches();
+
+// --- LEAGUES ---
+async function loadLeagues(){
+  const snapshot = await getDocs(collection(db,"leagues"));
+  let html="";
+  snapshot.forEach(docSnap=>{
+    html+=`
+      <div class="card">
+        <input type="text" value="${docSnap.data().name}" id="league_${docSnap.id}">
+        <button class="action" onclick="updateLeague('${docSnap.id}')">Save</button>
+        <button class="delete-btn" onclick="deleteLeague('${docSnap.id}')">Delete</button>
+      </div>
+    `;
+  });
+  document.getElementById("leaguesList").innerHTML=html;
+  loadLeaguesForMatches();
+  loadLeaderboard();
+}
+async function addLeague(){
+  const name = document.getElementById("newLeague").value.trim();
+  if(!name) return alert("Enter league name");
+  await addDoc(collection(db,"leagues"),{name});
+  document.getElementById("newLeague").value="";
+  loadLeagues();
+}
+async function updateLeague(id){
+  const name = document.getElementById(`league_${id}`).value.trim();
+  if(!name) return alert("Enter league name");
+  await updateDoc(doc(db,"leagues",id),{name});
+  loadLeagues();
+}
+async function deleteLeague(id){
+  if(!confirm("Delete this league?")) return;
+  await deleteDoc(doc(db,"leagues",id));
+  loadLeagues();
+}
+loadLeagues();
+
+// --- LEADERBOARD ---
+async function loadLeaderboard(){
+  const league = document.getElementById("leaderboardLeague").value;
+  const category = document.getElementById("leaderboardCategory").value;
+  const snapshot = await getDocs(collection(db,"players"));
+  let leaderboard=[];
+  snapshot.forEach(docSnap=>{
+    const p=docSnap.data();
+    leaderboard.push({
+      id:docSnap.id,
+      name:p.name,
+      pos:p.pos,
+      goals:Number(p.goals)||0,
+      assist:Number(p.assist)||0,
+      saves:Number(p.saves)||0,
+      match:Number(p.match)||0,
+      leagues: Array.isArray(p.leagues) ? p.leagues : []
+    });
+  });
+  if(league!=="all") leaderboard=leaderboard.filter(p=>p.leagues.includes(league));
+  leaderboard.sort((a,b)=> (b[category]||0)-(a[category]||0));
+  let html="";
+  leaderboard.forEach((p,index)=>{
+    html+=`
+      <div class="card">
+        <div class="player-info"><strong>#${index+1} ${p.name}</strong> (${p.pos})<br>Matches: ${p.match}</div>
+        <div>G:${p.goals} | A:${p.assist} | S:${p.saves}</div>
+      </div>
+    `;
+  });
+  document.getElementById("leaderboardList").innerHTML=html;
+}
+loadLeaderboard();
 </script>
-
 </body>
 </html>
