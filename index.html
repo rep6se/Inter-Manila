@@ -1,3 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Inter Manila Club Manager</title>
+
+<style>
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+h1{
+text-align:center;
+}
+
+.card{
+background:#1e293b;
+padding:15px;
+border-radius:12px;
+margin-bottom:12px;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin:6px 0;
+border-radius:8px;
+border:none;
+}
+
+button{
+background:#22c55e;
+color:white;
+padding:12px;
+border:none;
+border-radius:10px;
+margin-top:8px;
+width:100%;
+font-weight:bold;
+cursor:pointer;
+}
+
+.player{
+background:#334155;
+padding:10px;
+border-radius:10px;
+margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>⚽ Inter Manila Squad</h1>
+
+<div class="card">
+<h3>Add Player</h3>
+
+<input id="name" placeholder="Player Name">
+<input id="number" type="number" placeholder="Number">
+
+<select id="pos">
+<option>GK</option>
+<option>CB</option>
+<option>LB</option>
+<option>RB</option>
+<option>CM</option>
+<option>RW</option>
+<option>LW</option>
+<option>ST</option>
+</select>
+
+<input id="ovr" type="number" placeholder="Overall">
+
+<button onclick="addPlayer()">Add Player</button>
+</div>
+
+<div id="players"></div>
+
+<!-- FIREBASE -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -35,6 +118,29 @@ match:0
 loadPlayers();
 };
 
+async function loadPlayers(){
+const querySnapshot = await getDocs(collection(db,"players"));
+let html="";
+
+querySnapshot.forEach((doc)=>{
+let p=doc.data();
+html+=`
+<div class="player">
+<b>#${p.number} ${p.name}</b><br>
+${p.pos} | OVR ${p.ovr}<br>
+Goals: ${p.goals} | Assist: ${p.assist} | Match: ${p.match}
+</div>`;
+});
+
+document.getElementById("players").innerHTML=html;
+}
+
+loadPlayers();
+
+</script>
+
+</body>
+</html>
 async function loadPlayers(){
 const querySnapshot = await getDocs(collection(db,"players"));
 let html="";
