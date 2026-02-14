@@ -64,6 +64,25 @@ padding:12px;
 border-radius:12px;
 margin-top:10px;
 text-align:left;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.player-info{
+flex:1;
+}
+
+.player button{
+width:auto;
+padding:6px 10px;
+font-size:13px;
+margin-left:10px;
+background:#dc2626;
+}
+
+.player button:hover{
+background:#b91c1c;
 }
 
 .back{
@@ -105,7 +124,7 @@ text-decoration:none;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
@@ -128,9 +147,9 @@ onAuthStateChanged(auth, (user) => {
 
 /* Tambah pemain */
 window.addPlayer = async function(){
-  let name=document.getElementById("name").value;
-  let number=document.getElementById("number").value;
-  let pos=document.getElementById("pos").value;
+  let name = document.getElementById("name").value.trim();
+  let number = document.getElementById("number").value;
+  let pos = document.getElementById("pos").value;
 
   if(!name || !number) return alert("Isi semua field");
 
@@ -144,24 +163,36 @@ window.addPlayer = async function(){
     match:0
   });
 
-  loadPlayers();
   document.getElementById("name").value="";
   document.getElementById("number").value="";
+  loadPlayers();
+};
+
+/* Hapus pemain */
+window.deletePlayer = async function(id){
+  if(confirm("Yakin ingin hapus pemain ini?")){
+    await deleteDoc(doc(db,"players",id));
+    loadPlayers();
+  }
 };
 
 /* Load roster */
 async function loadPlayers(){
-  const querySnapshot = await getDocs(collection(db,"players"));
+  const snapshot = await getDocs(collection(db,"players"));
   let html="";
 
-  querySnapshot.forEach((doc)=>{
-    let p = doc.data();
+  snapshot.forEach((docSnap)=>{
+    let p = docSnap.data();
     html+=`
       <div class="player">
-        <b>#${p.number} ${p.name}</b><br>
-        ${p.pos}<br>
-        Goals: ${p.goals} | Assist: ${p.assist} | Saves: ${p.saves} | Match: ${p.match}
-      </div>`;
+        <div class="player-info">
+          <b>#${p.number} ${p.name}</b><br>
+          ${p.pos}<br>
+          Goals: ${p.goals} | Assist: ${p.assist} | Saves: ${p.saves} | Match: ${p.match}
+        </div>
+        <button onclick="deletePlayer('${docSnap.id}')">Delete</button>
+      </div>
+    `;
   });
 
   document.getElementById("players").innerHTML = html;
