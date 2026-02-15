@@ -23,54 +23,64 @@
         body { 
             margin: 0; font-family: 'Segoe UI', sans-serif; 
             background: radial-gradient(circle at top, #0f172a, #020617); 
-            color: #f1f5f9; min-height: 100vh; padding-bottom: 100px;
+            color: #f1f5f9; min-height: 100vh; padding-bottom: 110px;
         }
 
-        header { text-align: center; padding: 50px 0 20px; }
-        header img { width: 65px; filter: drop-shadow(0 0 15px var(--primary-glow)); }
-        header h1 { margin: 12px 0 0; font-size: 20px; color: #fff; text-transform: uppercase; letter-spacing: 4px; font-weight: 800; }
+        header { text-align: center; padding: 40px 0 10px; }
+        header img { width: 55px; filter: drop-shadow(0 0 15px var(--primary-glow)); }
+        header h1 { margin: 10px 0 0; font-size: 18px; color: #fff; text-transform: uppercase; letter-spacing: 3px; font-weight: 800; }
 
-        .container { max-width: 450px; margin: 0 auto; padding: 0 18px; }
+        .container { max-width: 450px; margin: 0 auto; padding: 0 15px; }
 
+        /* Filter Style */
+        .filter-section { margin-bottom: 20px; padding: 0 5px; }
+        .filter-box {
+            width: 100%; background: #1e293b; color: white; border: 1px solid rgba(255,255,255,0.1); 
+            padding: 12px 15px; border-radius: 18px; font-size: 12px; font-weight: 700; outline: none;
+            appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2360a5fa'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 15px center; background-size: 15px;
+        }
+
+        /* Match Card Refined */
         .match-card { 
-            background: var(--surface); border-radius: 30px; padding: 25px; 
-            margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08); 
-            position: relative; backdrop-filter: blur(10px);
+            background: var(--surface); border-radius: 28px; padding: 20px; 
+            margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.06); 
+            backdrop-filter: blur(10px); transition: 0.3s;
         }
 
+        .match-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .league-badge { 
-            display: inline-block; background: rgba(37, 99, 235, 0.15); color: var(--accent); 
-            font-size: 9px; font-weight: 800; padding: 6px 14px; border-radius: 12px;
-            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;
+            background: rgba(37, 99, 235, 0.12); color: var(--accent); 
+            font-size: 9px; font-weight: 800; padding: 5px 12px; border-radius: 10px;
+            text-transform: uppercase; letter-spacing: 0.5px;
         }
+        .match-date { font-size: 9px; color: #64748b; font-weight: 700; text-transform: uppercase; }
 
-        .score-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; gap: 10px; }
-        .team-name { flex: 1; font-weight: 800; font-size: 12px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+        .score-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 5px 0; }
+        .team { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .team-name { font-weight: 800; font-size: 11px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 5px; }
         
-        .score-center { flex: 1.2; text-align: center; min-width: 100px; }
+        .score-center { flex: 1; text-align: center; }
         .agg-score { 
-            font-size: 42px; 
-            font-weight: 900; 
-            color: #fff; 
-            letter-spacing: -2px; 
-            line-height: 1; 
-            white-space: nowrap; 
-            display: inline-block;
+            font-size: 34px; font-weight: 900; letter-spacing: -1px; line-height: 1; 
+            background: linear-gradient(to bottom, #fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
+        .match-result { font-size: 9px; font-weight: 800; text-transform: uppercase; margin-top: 5px; letter-spacing: 1px; }
 
+        /* Stats Box */
         .stats-box { 
-            background: rgba(15, 23, 42, 0.5); border-radius: 20px; padding: 15px; 
-            margin-top: 20px; border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(15, 23, 42, 0.4); border-radius: 20px; padding: 12px 15px; 
+            margin-top: 15px; border: 1px solid rgba(255,255,255,0.04);
         }
-        .stat-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03); align-items: center; }
+        .stat-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.03); align-items: center; }
         .stat-item:last-child { border-bottom: none; }
         
-        .stat-player { font-size: 12px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; gap: 8px; }
-        .stat-player small { font-size: 9px; color: var(--accent); opacity: 0.8; font-weight: 800; }
-        .stat-vals { font-size: 11px; font-weight: 900; color: var(--accent); }
-
-        .ic-motm { color: var(--warning); font-size: 10px; }
-        .ic-mvp { color: #facc15; font-size: 10px; }
+        .stat-player { font-size: 11px; font-weight: 700; color: #e2e8f0; display: flex; align-items: center; gap: 6px; }
+        .stat-player i { font-size: 9px; }
+        .stat-vals { font-size: 10px; font-weight: 800; color: var(--accent); display: flex; gap: 8px; }
+        .v-g { color: var(--success); }
+        .v-a { color: var(--warning); }
+        .v-s { color: var(--accent); }
 
         .bottom-nav { 
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
@@ -92,8 +102,14 @@
     </header>
 
     <div class="container">
+        <div class="filter-section">
+            <select id="matchFilter" class="filter-box">
+                <option value="all">All Competitions</option>
+            </select>
+        </div>
+
         <div id="matchList">
-            <p style="text-align:center; color:#64748b; font-size:11px; padding:40px;">Loading matches...</p>
+            <p style="text-align:center; color:#64748b; font-size:11px; padding:40px;">Fetching matches...</p>
         </div>
     </div>
 
@@ -119,52 +135,97 @@
 
         const _0xapp = _0xinit(_0xcnf);
         const _0xfs = _0xdb(_0xapp);
+        let _0xallMatches = [];
 
         _0xsnap(_0xqry(_0xcoll(_0xfs, "\x6d\x61\x74\x63\x68\x65\x73"), _0xord("\x74\x69\x6d\x65\x73\x74\x61\x6d\x70", "\x64\x65\x73\x63")), (_0xs) => {
-            const _0xl = document.getElementById('matchList');
-            _0xl.innerHTML = "";
+            _0xallMatches = _0xs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            _0xupdateFilterDropdown();
+            _0xrenderMatches();
+        });
 
-            if (_0xs.empty) {
-                _0xl.innerHTML = '<p style="text-align:center; color:#64748b; font-size:11px; padding:40px;">No match records found.</p>';
+        function _0xupdateFilterDropdown() {
+            const filter = document.getElementById('matchFilter');
+            const currentVal = filter.value;
+            const leagues = [...new Set(_0xallMatches.map(m => `${m.league} ${m.season}`.trim()))].filter(Boolean).sort();
+            
+            let html = '<option value="all">All Competitions</option>';
+            leagues.forEach(l => {
+                html += `<option value="${l}" ${currentVal === l ? 'selected' : ''}>${l}</option>`;
+            });
+            filter.innerHTML = html;
+        }
+
+        function _0xrenderMatches() {
+            const list = document.getElementById('matchList');
+            const selectedFilter = document.getElementById('matchFilter').value;
+            
+            const filtered = selectedFilter === 'all' 
+                ? _0xallMatches 
+                : _0xallMatches.filter(m => `${m.league} ${m.season}`.trim() === selectedFilter);
+
+            list.innerHTML = "";
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:#64748b; font-size:11px; padding:40px;">No matches found for this selection.</p>';
                 return;
             }
 
-            _0xs.forEach((_0xd) => {
-                const _0xm = _0xd.data();
-                let _0xsc = "#fff"; 
-                if(_0xm.homeScore > _0xm.awayScore) _0xsc = "#10b981"; 
-                else if(_0xm.homeScore < _0xm.awayScore) _0xsc = "#ef4444"; 
+            filtered.forEach((m) => {
+                const h = parseInt(m.homeScore) || 0;
+                const a = parseInt(m.awayScore) || 0;
+                
+                let resText = "DRAW", resColor = "#94a3b8";
+                if(h > a) { resText = "VICTORY"; resColor = "var(--success)"; }
+                else if(h < a) { resText = "DEFEAT"; resColor = "var(--danger)"; }
 
-                _0xl.innerHTML += `
+                // Format Date simple
+                const dateObj = m.timestamp?.toDate ? m.timestamp.toDate() : null;
+                const dateStr = dateObj ? dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Recent Match';
+
+                list.innerHTML += `
                 <div class="match-card">
-                    <div class="league-badge">${_0xm.league} • ${_0xm.season}</div>
-                    <div class="score-row">
-                        <div class="team-name">INTER MANILA</div>
-                        <div class="score-center">
-                            <div class="agg-score" style="color:${_0xsc}">${_0xm.homeScore}-${_0xm.awayScore}</div>
-                        </div>
-                        <div class="team-name" style="text-align:right;">${_0xm.opponent}</div>
+                    <div class="match-top">
+                        <div class="league-badge">${m.league} • ${m.season}</div>
+                        <div class="match-date">${dateStr}</div>
                     </div>
+                    <div class="score-row">
+                        <div class="team">
+                            <img src="inter-milan-old.png" style="width:30px; opacity:0.9;">
+                            <div class="team-name">INTER MANILA</div>
+                        </div>
+                        <div class="score-center">
+                            <div class="agg-score">${h}-${a}</div>
+                            <div class="match-result" style="color:${resColor}">${resText}</div>
+                        </div>
+                        <div class="team">
+                            <div style="width:30px; height:30px; background:rgba(255,255,255,0.05); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;"><i class="fa fa-shield-halved" style="opacity:0.3;"></i></div>
+                            <div class="team-name">${m.opponent}</div>
+                        </div>
+                    </div>
+                    
+                    ${m.scorers && m.scorers.some(s => s.goals > 0 || s.assists > 0 || s.saves > 0) ? `
                     <div class="stats-box">
-                        ${_0xm.scorers ? _0xm.scorers.filter(_0xf => _0xf.goals > 0 || _0xf.assists > 0 || _0xf.saves > 0).map(_0xf => `
+                        ${m.scorers.filter(s => s.goals > 0 || s.assists > 0 || s.saves > 0).map(s => `
                             <div class="stat-item">
                                 <span class="stat-player">
-                                    ${_0xf.name} <small>${_0xf.pos || ''}</small>
-                                    ${_0xf.id === _0xm.motmId ? '<i class="fa fa-medal ic-motm"></i>' : ''}
-                                    ${_0xf.id === _0xm.mvpId ? '<i class="fa fa-crown ic-mvp"></i>' : ''}
+                                    ${s.name}
+                                    ${s.id === m.motmId ? '<i class="fa fa-medal" style="color:var(--warning)"></i>' : ''}
+                                    ${s.id === m.mvpId ? '<i class="fa fa-crown" style="color:#facc15"></i>' : ''}
                                 </span>
                                 <span class="stat-vals">
-                                    ${_0xf.goals > 0 ? `<span>${_0xf.goals}G</span>` : ''}
-                                    ${_0xf.assists > 0 ? `<span style="margin-left:5px;">${_0xf.assists}A</span>` : ''}
-                                    ${_0xf.saves > 0 ? `<span style="margin-left:5px;">${_0xf.saves}S</span>` : ''}
+                                    ${s.goals > 0 ? `<span class="v-g">${s.goals}G</span>` : ''}
+                                    ${s.assists > 0 ? `<span class="v-a">${s.assists}A</span>` : ''}
+                                    ${s.saves > 0 ? `<span class="v-s">${s.saves}S</span>` : ''}
                                 </span>
                             </div>
-                        `).join('') : '<p style="font-size:10px; color:#64748b; text-align:center; margin:0;">No individual stats</p>'}
-                    </div>
+                        `).join('')}
+                    </div>` : ''}
                 </div>`;
             });
-        });
+        }
+
+        document.getElementById('matchFilter').onchange = _0xrenderMatches;
     </script>
 </body>
-          </html>
-  
+    </html>
+            
