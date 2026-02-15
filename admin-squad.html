@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inter Manila — Squad Management</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb; --primary-glow: rgba(37, 99, 235, 0.4); --dark: #020617;
+            --surface: #1e293b; --accent: #60a5fa; --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+        }
+
+        body { 
+            display: none; margin: 0; font-family: 'Segoe UI', sans-serif; 
+            background: radial-gradient(circle at top, #0f172a, #020617); 
+            color: #f1f5f9; min-height: 100vh; padding-bottom: 80px;
+        }
+
+        header { text-align: center; padding: 40px 0 20px; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        header img { width: 55px; margin-bottom: 10px; filter: drop-shadow(0 0 15px var(--primary-glow)); }
+        header h1 { margin: 0; font-size: 20px; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; font-weight: 800; }
+
+        nav { display: flex; justify-content: center; padding: 15px; gap: 10px; background: rgba(15, 23, 42, 0.95); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        nav a { text-decoration: none; background: rgba(30, 41, 59, 0.5); color: #64748b; padding: 12px 18px; border-radius: 16px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        nav a.active { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
+
+        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+
+        .btn-add { 
+            width: 100%; padding: 18px; background: linear-gradient(135deg, var(--primary), #1d4ed8); 
+            color: white; border: none; border-radius: 22px; font-weight: 800; font-size: 13px;
+            cursor: pointer; margin-bottom: 25px; letter-spacing: 1px; text-transform: uppercase;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25); transition: 0.3s;
+        }
+
+        .player-card { 
+            background: rgba(30, 41, 59, 0.4); border-radius: 30px; padding: 25px; 
+            margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.08); 
+            position: relative; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: space-between;
+        }
+        .player-card.inactive { opacity: 0.4; filter: grayscale(1); border-style: dashed; }
+
+        .player-actions { display: flex; gap: 12px; }
+        .player-actions i { cursor: pointer; font-size: 18px; transition: 0.2s; padding: 5px; }
+        .player-actions .fa-edit { color: var(--accent); }
+        .player-actions .fa-trash { color: var(--danger); }
+        .player-actions .fa-toggle-on { color: var(--success); }
+        .player-actions .fa-toggle-off { color: #64748b; }
+
+        .pos-badge { display: inline-block; background: rgba(37, 99, 235, 0.15); color: var(--accent); font-size: 9px; font-weight: 900; padding: 4px 12px; border-radius: 10px; text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
+        .p-name { font-size: 18px; font-weight: 800; color: #fff; display: block; }
+        .p-status { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-top: 4px; display: block;}
+
+        .modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(15px); }
+        .modal-content { background: #1e293b; width: 90%; max-width: 400px; margin: 50px auto; border-radius: 35px; border: 1px solid rgba(255,255,255,0.1); padding: 30px 20px; }
+
+        input { width: 100%; padding: 15px; margin-bottom: 20px; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 15px; box-sizing: border-box; }
+        label { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 8px; padding-left: 5px;}
+
+        .pos-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 25px; }
+        .pos-opt { background: #0f172a; border: 1px solid rgba(255,255,255,0.1); padding: 12px 0; text-align: center; border-radius: 12px; font-size: 11px; font-weight: 800; color: #64748b; cursor: pointer; transition: 0.2s; }
+        .pos-opt.selected { background: var(--primary); color: white; border-color: var(--accent); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
+    </style>
+</head>
+<body>
+
+    <header><img src="inter-milan-old.png" alt="Logo"><h1>Squad Management</h1></header>
+
+    <nav>
+        <a href="admin-dashboard.html"><i class="fa fa-home"></i> Home</a>
+        <a href="admin-squad.html" class="active"><i class="fa fa-users"></i> Squad</a>
+        <a href="admin-matches.html"><i class="fa fa-futbol"></i> Matches</a>
+        <a href="admin-records.html"><i class="fa fa-medal"></i> Records</a>
+    </nav>
+
+    <div class="container">
+        <button class="btn-add" id="_0xopM"><i class="fa fa-user-plus"></i> Register New Player</button>
+        <div id="_0xplL"><p style="text-align:center; color:#64748b; font-size:12px; font-weight:700;">Loading squad data...</p></div>
+    </div>
+
+    <div id="_0xmdl" class="modal">
+        <div class="modal-content">
+            <div id="_0xmdT" style="font-weight:800; text-align:center; margin-bottom:20px; text-transform: uppercase;">Register Player</div>
+            <form id="_0xpF">
+                <input type="hidden" id="_0xpid">
+                <label>Full Name</label>
+                <input type="text" id="_0xpNi" placeholder="Player name..." required>
+                <label>Positions</label>
+                <div class="pos-selector">
+                    <div class="pos-opt" data-val="GK">GK</div>
+                    <div class="pos-opt" data-val="DF">DF</div>
+                    <div class="pos-opt" data-val="MF">MF</div>
+                    <div class="pos-opt" data-val="FW">FW</div>
+                </div>
+                <button type="submit" class="btn-add">Save Player Data</button>
+                <button type="button" id="_0xclM" style="width:100%; background:none; border:none; color:#64748b; font-weight:800; cursor:pointer; margin-top:10px;">CANCEL</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp as _0xI } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth as _0xG, onAuthStateChanged as _0xC } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore as _0xF, collection as _0xCL, addDoc as _0xAD, onSnapshot as _0xSN, query as _0xQR, orderBy as _0xOB, doc as _0xDC, deleteDoc as _0xDD, updateDoc as _0xUD } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const _0xcf = {
+            apiKey: "\x41\x49\x7a\x61\x53\x79\x41\x75\x71\x55\x63\x58\x59\x6a\x4d\x55\x2d\x58\x61\x4c\x5f\x77\x37\x68\x34\x79\x34\x33\x52\x48\x6b\x75\x34\x64\x51\x47\x46\x6c\x6b",
+            authDomain: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x61\x70\x70\x2e\x63\x6f\x6d",
+            projectId: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61",
+            storageBucket: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x73\x74\x6f\x72\x61\x67\x65\x2e\x61\x70\x70",
+            messagingSenderId: "\x32\x38\x35\x35\x30\x37\x32\x37\x39\x33\x34\x32",
+            appId: "\x31\x3a\x32\x38\x35\x35\x30\x37\x32\x37\x39\x33\x34\x32\x3a\x77\x65\x62\x3a\x35\x61\x61\x30\x63\x38\x30\x61\x30\x38\x66\x62\x39\x32\x37\x32\x37\x34\x31\x36\x66\x66"
+        };
+
+        const _0xA = _0xI(_0xcf);
+        const _0xau = _0xG(_0xA);
+        const _0xdb = _0xF(_0xA);
+
+        let _0xselP = [];
+        let _0xpD = {};
+
+        _0xC(_0xau, (_0xu) => {
+            if (_0xu) { document.body.style.display = "block"; _0xinit(); }
+            else { window.location.href = "\x6c\x6f\x67\x69\x6e\x2e\x68\x74\x6d\x6c"; }
+        });
+
+        function _0xinit() {
+            document.querySelectorAll('.pos-opt').forEach(o => {
+                o.onclick = () => {
+                    const v = o.dataset.val;
+                    if(_0xselP.includes(v)) {
+                        _0xselP = _0xselP.filter(x => x !== v);
+                        o.classList.remove('selected');
+                    } else {
+                        _0xselP.push(v);
+                        o.classList.add('selected');
+                    }
+                };
+            });
+
+            _0xSN(_0xQR(_0xCL(_0xdb, "\x70\x6c\x61\x79\x65\x72\x73"), _0xOB("\x6e\x61\x6d\x65", "\x61\x73\x63")), (sn) => {
+                const l = document.getElementById('_0xplL');
+                l.innerHTML = "";
+                if (sn.empty) { l.innerHTML = '<p style="text-align:center;color:#64748b;font-size:12px;">No players.</p>'; return; }
+                sn.forEach(d => {
+                    const p = d.data(); _0xpD[d.id] = p;
+                    const ac = p.active !== false;
+                    const pa = Array.isArray(p.pos) ? p.pos : [p.pos];
+                    l.innerHTML += `
+                        <div class="player-card ${ac ? '' : 'inactive'}">
+                            <div>
+                                <span class="p-name">${p.name}</span>
+                                <span class="p-status">${ac ? 'Active Member' : 'Ex-Player'}</span>
+                                <div style="margin-top:5px;">${pa.map(x => `<span class="pos-badge">${x}</span>`).join(' ')}</div>
+                            </div>
+                            <div class="player-actions">
+                                <i class="fa fa-toggle-${ac?'on':'off'}" onclick="_0xtgS('${d.id}', ${ac})"></i>
+                                <i class="fa fa-edit" onclick="_0xedP('${d.id}')"></i>
+                                <i class="fa fa-trash" onclick="_0xdlP('${d.id}')"></i>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        window._0xtgS = async (id, s) => { await _0xUD(_0xDC(_0xdb, "\x70\x6c\x61\x79\x65\x72\x73", id), { active: !s }); };
+
+        window._0xedP = (id) => {
+            const p = _0xpD[id];
+            document.getElementById('_0xpid').value = id;
+            document.getElementById('_0xpNi').value = p.name;
+            _0xselP = Array.isArray(p.pos) ? [...p.pos] : [p.pos];
+            document.querySelectorAll('.pos-opt').forEach(o => o.classList.toggle('selected', _0xselP.includes(o.dataset.val)));
+            document.getElementById('_0xmdT').innerText = "Edit Player";
+            document.getElementById('_0xmdl').style.display='block';
+        };
+
+        window._0xdlP = async (id) => { if(confirm("Hapus pemain ini?")) await _0xDD(_0xDC(_0xdb, "\x70\x6c\x61\x79\x65\x72\x73", id)); };
+
+        document.getElementById('_0xpF').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('_0xpid').value;
+            const n = document.getElementById('_0xpNi').value;
+            if(_0xselP.length === 0) return alert("Select position!");
+            const dt = { name: n, pos: _0xselP };
+            try {
+                if(id) await _0xUD(_0xDC(_0xdb, "\x70\x6c\x61\x79\x65\x72\x73", id), dt);
+                else await _0xAD(_0xCL(_0xdb, "\x70\x6c\x61\x79\x65\x72\x73"), { ...dt, goals:0, assists:0, saves:0, motm:0, mvp:0, active:true });
+                _0xcl();
+            } catch(ex) { alert(ex.message); }
+        };
+
+        document.getElementById('_0xopM').onclick = () => { document.getElementById('_0xmdl').style.display='block'; };
+        document.getElementById('_0xclM').onclick = _0xcl;
+
+        function _0xcl() {
+            document.getElementById('_0xmdl').style.display='none';
+            document.getElementById('_0xpF').reset();
+            document.getElementById('_0xpid').value = "";
+            _0xselP = [];
+            document.querySelectorAll('.pos-opt').forEach(o => o.classList.remove('selected'));
+            document.getElementById('_0xmdT').innerText = "Register Player";
+        }
+    </script>
+</body>
+                  </html>
+  
