@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inter Manila — Dashboard Admin</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb; --primary-glow: rgba(37, 99, 235, 0.4); --dark: #020617;
+            --surface: #1e293b; --accent: #60a5fa; --success: #10b981; --danger: #ef4444;
+            --warning: #f59e0b; --gold: #fbbf24; --silver: #94a3b8; --bronze: #d97706;
+        }
+
+        body { 
+            display: none; margin: 0; font-family: 'Segoe UI', sans-serif; 
+            background: radial-gradient(circle at top, #0f172a, #020617); 
+            color: #f1f5f9; min-height: 100vh; padding-bottom: 80px;
+        }
+
+        header { text-align: center; padding: 40px 0 20px; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.05); position: relative;}
+        header img { width: 55px; margin-bottom: 10px; filter: drop-shadow(0 0 15px var(--primary-glow)); }
+        header h1 { margin: 0; font-size: 20px; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; font-weight: 800; }
+
+        .logout-btn { position: absolute; top: 25px; right: 25px; color: var(--danger); font-size: 18px; cursor: pointer; opacity: 0.7; transition: 0.3s; padding: 10px; }
+
+        nav { display: flex; justify-content: center; padding: 15px; gap: 10px; background: rgba(15, 23, 42, 0.95); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        nav a { text-decoration: none; background: rgba(30, 41, 59, 0.5); color: #64748b; padding: 12px 18px; border-radius: 16px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        nav a.active { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
+
+        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .welcome-box h2 { font-size: 24px; font-weight: 800; margin: 0; }
+        .welcome-box p { color: var(--accent); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 5px; }
+
+        select { background: #0f172a; color: white; border: 1px solid rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 15px; font-size: 12px; font-weight: 700; outline: none; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .stat-card { background: rgba(30, 41, 59, 0.4); border-radius: 30px; padding: 25px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
+        .stat-card h3 { margin: 0; font-size: 10px; text-transform: uppercase; color: #64748b; letter-spacing: 1.5px; font-weight: 800; }
+        .stat-card .val { font-size: 32px; font-weight: 900; margin: 8px 0; display: block; color: #fff; }
+        .stat-sub { font-size: 10px; color: var(--accent); font-weight: 800; text-transform: uppercase; margin: 0; }
+
+        .full-card { grid-column: span 2; text-align: center; background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), transparent); }
+        .trophy-card { grid-column: span 2; background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), transparent); border: 1px solid rgba(245, 158, 11, 0.2); padding: 20px 25px; }
+        
+        .mini-trophy-list { display: flex; flex-direction: column; gap: 6px; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(245, 158, 11, 0.1); }
+        .mini-t-item { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; color: #cbd5e1; }
+        .mini-t-item span { color: #64748b; font-size: 9px; margin-left: auto; }
+
+        .form-dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; opacity: 0.3; }
+        .dot-W { background: var(--success); box-shadow: 0 0 10px var(--success); opacity: 1; }
+        .dot-L { background: var(--danger); box-shadow: 0 0 10px var(--danger); opacity: 1; }
+        .dot-D { background: #64748b; opacity: 1; }
+
+        .activity-item { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .team-info b { font-size: 15px; color: #fff; display: block; margin-bottom: 4px; }
+        .team-info small { font-size: 9px; color: #64748b; font-weight: 800; text-transform: uppercase; }
+        .score-pill { padding: 8px 12px; border-radius: 12px; font-weight: 900; font-size: 15px; background: #020617; border: 1px solid rgba(255,255,255,0.1); min-width: 65px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="inter-milan-old.png" alt="Logo">
+        <h1>Admin Center</h1>
+        <i class="fa fa-power-off logout-btn" id="_0xlog"></i>
+    </header>
+
+    <nav>
+        <a href="admin-dashboard.html" class="active"><i class="fa fa-house"></i> Home</a>
+        <a href="admin-squad.html"><i class="fa fa-users"></i> Squad</a>
+        <a href="admin-matches.html"><i class="fa fa-futbol"></i> Matches</a>
+        <a href="admin-records.html"><i class="fa fa-medal"></i> Records</a>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="welcome-box"><h2>Dashboard</h2><p id="_0xsnL">All-Time Stats</p></div>
+            <select id="_0xfS"><option value="all">All Seasons</option></select>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card full-card"><h3>Win Rate</h3><span class="val" id="_0xwR">--%</span><div class="form-dots" id="_0xmF"></div></div>
+            <div class="stat-card trophy-card">
+                <div class="trophy-header"><h3>Club Honors</h3><span class="val" id="_0xtR">0</span></div>
+                <div id="_0xmT" class="mini-trophy-list"></div>
+            </div>
+            <div class="stat-card"><h3>Matches</h3><span class="val" id="_0xtM">--</span><p class="stat-sub" id="_0xwdl">Loading...</p></div>
+            <div class="stat-card"><h3>Players</h3><span class="val" id="_0xtP">--</span><p class="stat-sub">Active Squad</p></div>
+            <div class="stat-card full-card"><h3>Avg Goals</h3><span class="val" id="_0xaG">--</span><p class="stat-sub">Per Match</p></div>
+        </div>
+
+        <div class="stat-card" style="margin-top:25px;">
+            <h4 style="margin:0 0 15px; font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:2px;"><i class="fa fa-history"></i> Recent Activity</h4>
+            <div id="_0xrec"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp as _0xI } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth as _0xG, onAuthStateChanged as _0xC, signOut as _0xO } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore as _0xF, collection as _0xCL, query as _0xQ, orderBy as _0xOB, onSnapshot as _0xS, limit as _0xLM } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const _0xcf = {
+            apiKey: "\x41\x49\x7a\x61\x53\x79\x41\x75\x71\x55\x63\x58\x59\x6a\x4d\x55\x2d\x58\x61\x4c\x5f\x77\x37\x68\x34\x79\x34\x33\x52\x48\x6b\x75\x34\x64\x51\x47\x46\x6c\x6b",
+            authDomain: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x61\x70\x70\x2e\x63\x6f\x6d",
+            projectId: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61",
+            storageBucket: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x73\x74\x6f\x72\x61\x67\x65\x2e\x61\x70\x70",
+            messagingSenderId: "\x32\x38\x35\x35\x30\x37\x32\x37\x39\x33\x34\x32",
+            appId: "\x31\x3a\x32\x38\x35\x35\x30\x37\x32\x37\x39\x33\x34\x32\x3a\x77\x65\x62\x3a\x35\x61\x61\x30\x63\x38\x30\x61\x30\x38\x66\x62\x39\x32\x37\x32\x37\x34\x31\x36\x66\x66"
+        };
+
+        const _0xA = _0xI(_0xcf);
+        const _0xau = _0xG(_0xA);
+        const _0xdb = _0xF(_0xA);
+        let _0xallM = [];
+
+        _0xC(_0xau, (_0xu) => {
+            if (_0xu) { document.body.style.display = "block"; _0xinit(); }
+            else { window.location.href = "\x6c\x6f\x67\x69\x6e\x2e\x68\x74\x6d\x6c"; }
+        });
+
+        function _0xinit() {
+            _0xS(_0xQ(_0xCL(_0xdb, "\x74\x72\x6f\x70\x68\x69\x65\x73"), _0xOB("\x74\x69\x6d\x65\x73\x74\x61\x6d\x70", "\x64\x65\x73\x63"), _0xLM(3)), (sn) => {
+                document.getElementById('_0xtR').innerText = sn.size;
+                const l = document.getElementById('_0xmT');
+                if(sn.empty) { l.innerHTML = '<div style="font-size:10px;color:#64748b;text-align:center;">No records</div>'; return; }
+                l.innerHTML = "";
+                sn.forEach(d => {
+                    const t = d.data();
+                    const ic = t.rank === 'gold' ? 'var(--gold)' : (t.rank === 'silver' ? 'var(--silver)' : 'var(--bronze)');
+                    l.innerHTML += `<div class="mini-t-item"><i class="fa fa-trophy" style="color:${ic}"></i>${t.name}<span>${t.season}</span></div>`;
+                });
+            });
+
+            _0xS(_0xCL(_0xdb, "\x70\x6c\x61\x79\x65\x72\x73"), (sn) => {
+                let c = 0; sn.forEach(d => { if(d.data().status !== 'Inactive') c++; });
+                document.getElementById('_0xtP').innerText = c;
+            });
+
+            _0xS(_0xQ(_0xCL(_0xdb, "\x6d\x61\x74\x63\x68\x65\x73"), _0xOB("\x74\x69\x6d\x65\x73\x74\x61\x6d\x70", "\x64\x65\x73\x63")), (sn) => {
+                _0xallM = sn.docs.map(d => d.data());
+                _0xuSF(); _0xrnS();
+            });
+        }
+
+        function _0xuSF() {
+            const s = document.getElementById('_0xfS');
+            const cv = s.value;
+            const lb = [...new Set(_0xallM.map(m => `${m.league} ${m.season}`.trim()))].filter(l => l !== "").sort();
+            let h = '<option value="all">All Seasons</option>';
+            lb.forEach(l => { h += `<option value="${l}" ${cv === l ? 'selected' : ''}>${l}</option>`; });
+            s.innerHTML = h;
+        }
+
+        function _0xrnS() {
+            const f = document.getElementById('_0xfS').value;
+            document.getElementById('_0xsnL').innerText = (f === 'all') ? "All-Time Stats" : f;
+            const fd = f === 'all' ? _0xallM : _0xallM.filter(m => `${m.league} ${m.season}`.trim() === f);
+            let st = { w:0, d:0, l:0, tg: 0 };
+            let rh = ""; let fh = [];
+
+            fd.forEach((m, i) => {
+                const hs = parseInt(m.homeScore) || 0; const as = parseInt(m.awayScore) || 0; st.tg += hs;
+                let r = 'D'; if(hs > as) { r = 'W'; st.w++; } else if(hs < as) { r = 'L'; st.l++; } else st.d++;
+                if(i < 5) fh.push(`<span class="dot dot-${r}"></span>`);
+                if(i < 5) {
+                    rh += `<div class="activity-item"><div class="team-info"><b>vs ${m.opponent}</b><small>${m.league} ${m.season}</small></div><div class="score-pill" style="color:${r==='W'?'#10b981':r==='L'?'#ef4444':'#94a3b8'}">${hs} - ${as}</div></div>`;
+                }
+            });
+
+            document.getElementById('_0xwR').innerText = fd.length ? Math.round((st.w / fd.length) * 100) + "%" : "0%";
+            document.getElementById('_0xtM').innerText = fd.length;
+            document.getElementById('_0xwdl').innerText = `${st.w}W ${st.d}D ${st.l}L`;
+            document.getElementById('_0xaG').innerText = fd.length ? (st.tg / fd.length).toFixed(1) : "0.0";
+            document.getElementById('_0xmF').innerHTML = fh.reverse().join('') || '<div class="dot"></div>';
+            document.getElementById('_0xrec').innerHTML = rh || '<p style="text-align:center;font-size:11px;color:#64748b;">No matches.</p>';
+        }
+
+        document.getElementById('_0xfS').onchange = _0xrnS;
+        document.getElementById('_0xlog').onclick = () => { if(confirm("Logout?")) _0xO(_0xau).then(() => window.location.href = 'login.html'); };
+    </script>
+</body>
+</html>
