@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inter Manila — Squad</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb; --primary-glow: rgba(37, 99, 235, 0.4); --dark: #020617;
+            --surface: rgba(30, 41, 59, 0.4); --accent: #60a5fa; --success: #10b981; --warning: #f59e0b;
+        }
+
+        body { 
+            margin: 0; font-family: 'Segoe UI', sans-serif; 
+            background: radial-gradient(circle at top, #0f172a, #020617); 
+            color: #f1f5f9; min-height: 100vh; padding-bottom: 110px;
+        }
+
+        header { text-align: center; padding: 50px 0 20px; }
+        header img { width: 65px; filter: drop-shadow(0 0 15px var(--primary-glow)); }
+        header h1 { margin: 12px 0 0; font-size: 20px; color: #fff; text-transform: uppercase; letter-spacing: 4px; font-weight: 800; }
+
+        .container { max-width: 450px; margin: 0 auto; padding: 0 18px; }
+
+        .squad-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 5px; }
+        .squad-info h2 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+        .squad-info p { color: var(--accent); margin: 2px 0 0; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+
+        .player-card { 
+            background: var(--surface); border-radius: 30px; padding: 22px; 
+            margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.08); 
+            position: relative; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 18px;
+        }
+        
+        .player-avatar {
+            width: 50px; height: 50px; background: rgba(15, 23, 42, 0.6); 
+            border-radius: 18px; display: flex; align-items: center; 
+            justify-content: center; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .player-avatar i { font-size: 20px; color: var(--accent); }
+
+        .p-name { font-size: 16px; font-weight: 800; color: #fff; display: block; margin-bottom: 6px; }
+        .pos-group { display: flex; flex-wrap: wrap; gap: 5px; }
+        
+        .pos-badge { 
+            display: inline-block; background: rgba(37, 99, 235, 0.15); color: var(--accent); 
+            font-size: 8px; font-weight: 900; padding: 3px 10px; border-radius: 8px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .status-tag {
+            margin-left: auto; font-size: 9px; font-weight: 800; 
+            color: var(--success); text-transform: uppercase; letter-spacing: 1px;
+            background: rgba(16, 185, 129, 0.1); padding: 5px 12px; border-radius: 10px;
+        }
+
+        .bottom-nav { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            width: calc(100% - 40px); max-width: 400px; 
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; 
+            display: flex; justify-content: space-around; padding: 10px; z-index: 1000; 
+        }
+        .nav-item { text-align: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 700; padding: 8px 12px; border-radius: 15px; transition: 0.3s; }
+        .nav-item i { display: block; font-size: 18px; margin-bottom: 4px; }
+        .nav-item.active { color: #fff; background: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+    </style>
+</head>
+<body>
+
+    <header><img src="inter-milan-old.png" alt="Logo"><h1>Inter Manila</h1></header>
+
+    <div class="container">
+        <div class="squad-info">
+            <div><h2>Our Squad</h2><p id="playerCount">Updating...</p></div>
+            <i class="fa fa-shield-halved" style="font-size: 24px; color: var(--accent); opacity: 0.5;"></i>
+        </div>
+        <div id="playerList"><p style="text-align:center; color:#64748b; font-size:11px; padding:40px;">Fetching player data...</p></div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><i class="fa fa-home"></i>HOME</a>
+        <a href="matches.html" class="nav-item"><i class="fa fa-futbol"></i>MATCHES</a>
+        <a href="records.html" class="nav-item"><i class="fa fa-medal"></i>RECORDS</a>
+        <a href="squad.html" class="nav-item active"><i class="fa fa-users"></i>SQUAD</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp as _0xinit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore as _0xdb, collection as _0xcoll, onSnapshot as _0xsnap, query as _0xqry, where as _0xwh } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const _0xcnf = {
+            apiKey: "\x41\x49\x7a\x61\x53\x79\x41\x75\x71\x55\x63\x58\x59\x6a\x4d\x55\x2d\x58\x61\x4c\x5f\x77\x37\x68\x34\x79\x34\x33\x52\x48\x6b\x75\x34\x64\x51\x47\x46\x6c\x6b",
+            authDomain: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x61\x70\x70\x2e\x63\x6f\x6d",
+            projectId: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61",
+            storageBucket: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x73\x74\x6f\x72\x61\x67\x65\x2e\x61\x70\x70",
+            messagingSenderId: "\x32\x38\x35\x35\x30\x37\x32\x37\x39\x33\x34\x32",
+            appId: "\x31\x3a\x32\x38\x35\x35\x30\x37\x32\x37\x39\x33\x34\x32\x3a\x77\x65\x62\x3a\x35\x61\x61\x30\x63\x38\x30\x61\x30\x38\x66\x62\x39\x32\x37\x32\x37\x34\x31\x36\x66\x66"
+        };
+
+        const _0xa = _0xinit(_0xcnf);
+        const _0xf = _0xdb(_0xa);
+        const _0xq = _0xqry(_0xcoll(_0xf, "\x70\x6c\x61\x79\x65\x72\x73"), _0xwh("\x61\x63\x74\x69\x76\x65", "==", true));
+
+        _0xsnap(_0xq, (_0xs) => {
+            const _0xl = document.getElementById('playerList');
+            const _0xc = document.getElementById('playerCount');
+            let _0xp = [];
+            _0xs.forEach(_0xd => { _0xp.push({ id: _0xd.id, ..._0xd.data() }); });
+            _0xp.sort((_0x1, _0x2) => _0x1.name.localeCompare(_0x2.name));
+
+            _0xl.innerHTML = "";
+            _0xc.innerText = `${_0xp.length} Active Players`;
+
+            if (_0xp.length === 0) {
+                _0xl.innerHTML = '<p style="text-align:center; color:#64748b; font-size:11px; padding:40px;">No records found.</p>';
+                return;
+            }
+
+            _0xp.forEach(_0xi => {
+                const _0xb = Array.isArray(_0xi.pos) ? _0xi.pos : [_0xi.pos];
+                _0xl.innerHTML += `
+                    <div class="player-card">
+                        <div class="player-avatar"><i class="fa fa-user-shield"></i></div>
+                        <div>
+                            <span class="p-name">${_0xi.name}</span>
+                            <div class="pos-group">${_0xb.map(_0xj => `<span class="pos-badge">${_0xj}</span>`).join('')}</div>
+                        </div>
+                        <div class="status-tag">Active</div>
+                    </div>`;
+            });
+        }, (_0xe) => {
+            document.getElementById('playerList').innerHTML = `<p style="text-align:center; color:#ef4444; font-size:11px; padding:40px;">Connection Error.</p>`;
+        });
+    </script>
+</body>
+</html>
