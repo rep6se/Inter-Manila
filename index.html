@@ -17,8 +17,6 @@ body {
   align-items:center;
   height:100vh;
 }
-
-/* Login Card */
 .login-card {
   background: rgba(30,41,59,0.95);
   padding:40px 30px;
@@ -29,18 +27,10 @@ body {
   transition: transform 0.3s;
 }
 .login-card:hover { transform: scale(1.03); }
-
 .login-card img { width:100px; margin-bottom:15px; transition: transform 0.3s; }
 .login-card img:hover { transform: scale(1.1); }
-
 .login-card h2 { margin:0 0 20px 0; color:#2563eb; }
-
-/* Form */
-.login-card form {
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-}
+.login-card form { display:flex; flex-direction:column; gap:15px; }
 .login-card input {
   padding:10px 15px;
   border-radius:12px;
@@ -53,8 +43,6 @@ body {
   box-shadow:0 0 8px #3b82f6;
   background: rgba(59,130,246,0.05);
 }
-
-/* Login Button */
 .login-card button {
   padding:12px;
   border:none;
@@ -71,15 +59,7 @@ body {
   box-shadow:0 6px 20px rgba(0,0,0,0.5);
   background: linear-gradient(135deg,#3b82f6,#60a5fa);
 }
-
-/* Error Message */
 #error-msg { color:#f87171; font-size:14px; height:18px; }
-
-/* Responsive */
-@media(max-width:400px){
-  .login-card { width:90%; padding:30px 20px; }
-  .login-card input, .login-card button { font-size:14px; }
-}
 </style>
 </head>
 <body>
@@ -98,7 +78,7 @@ body {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 <script>
-const firebaseConfig = { /* your firebase config */ };
+const firebaseConfig = { /* ISI DENGAN CONFIG FIREBASE-MU */ };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
@@ -117,4 +97,4 @@ loginForm.addEventListener('submit', e=>{
 </script>
 
 </body>
-</html>
+  </html>
