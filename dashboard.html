@@ -14,46 +14,7 @@ body {
   color:#f1f5f9;
 }
 
-/* Header */
-header {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  padding:20px 0;
-  background: rgba(30,41,59,0.95);
-  box-shadow:0 2px 10px rgba(0,0,0,0.5);
-}
-header img { width:80px; margin-bottom:5px; transition: transform 0.3s; }
-header img:hover { transform: scale(1.1); }
-header h1 { margin:0; color:#2563eb; font-size:24px; font-weight:700; }
-
-/* Menu */
-nav {
-  display:flex;
-  justify-content:center;
-  background: rgba(30,41,59,0.95);
-  padding:12px 0;
-  gap:20px;
-  flex-wrap:wrap;
-  box-shadow:0 2px 8px rgba(0,0,0,0.3);
-}
-nav button {
-  background: linear-gradient(135deg,#2563eb,#3b82f6);
-  color:white;
-  border:none;
-  padding:10px 15px;
-  border-radius:12px;
-  font-weight:600;
-  cursor:pointer;
-  transition: all 0.3s ease;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-nav button:hover { transform:translateY(-2px) scale(1.05); box-shadow:0 6px 20px rgba(0,0,0,0.5); background: linear-gradient(135deg,#3b82f6,#60a5fa); }
-
-/* Logout */
+/* Logout Button */
 #btn-logout {
   position:absolute;
   top:15px;
@@ -67,83 +28,60 @@ nav button:hover { transform:translateY(-2px) scale(1.05); box-shadow:0 6px 20px
   cursor:pointer;
   transition:0.3s;
 }
-#btn-logout:hover { transform:scale(1.05); box-shadow:0 4px 12px rgba(0,0,0,0.4); }
+#btn-logout:hover { transform:scale(1.05); }
 
-/* Welcome Card */
-#welcomeCard {
-  max-width:900px;
-  margin:20px auto;
-  padding:20px;
-  background: rgba(30,41,59,0.95);
-  border-radius:15px;
+/* Header */
+header {
   text-align:center;
-  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  padding:20px;
 }
-#welcomeCard h2 { margin:0 0 10px 0; color:#60a5fa; }
-#welcomeCard p { margin:0; font-size:16px; }
+header h1 { color:#2563eb; }
 
-/* Quick Stats */
-.stats-container {
-  max-width:900px;
-  margin:20px auto;
+/* Navigation */
+nav {
   display:flex;
+  justify-content:center;
+  gap:15px;
+  flex-wrap:wrap;
+  background: rgba(30,41,59,0.95);
+  padding:12px 0;
+  box-shadow:0 2px 8px rgba(0,0,0,0.3);
+}
+nav button {
+  padding:10px 15px;
+  border-radius:12px;
+  border:none;
+  background: linear-gradient(135deg,#2563eb,#3b82f6);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+nav button:hover { transform:scale(1.05); }
+
+/* Cards */
+.container {
+  max-width:1000px;
+  margin:20px auto;
+  text-align:center;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
   gap:20px;
-  flex-wrap:nowrap; /* jangan turun ke bawah */
-  overflow-x:auto;  /* scroll horizontal di mobile */
-  justify-content:flex-start; /* default mobile */
-  padding-bottom:10px;
 }
-.stats-container::-webkit-scrollbar { height:6px; }
-.stats-container::-webkit-scrollbar-thumb { background:#2563eb; border-radius:3px; }
-
-.stat-card {
-  flex:0 0 200px; /* fix width */
+.card {
   background: rgba(30,41,59,0.95);
-  padding:20px;
-  border-radius:15px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.5);
-  text-align:center;
-  transition: transform 0.3s;
+  padding:20px 30px;
+  border-radius:12px;
+  min-width:150px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  transition:0.3s;
 }
-.stat-card:hover { transform: translateY(-5px) scale(1.03); }
-.stat-card h3 { margin:0 0 10px 0; color:#10b981; }
-.stat-card p { margin:0; font-size:20px; font-weight:600; }
+.card:hover { transform:scale(1.03); box-shadow:0 6px 25px rgba(0,0,0,0.5); }
 
-/* Recent Activity */
-.activity-card {
-  max-width:900px;
-  margin:20px auto;
-  padding:15px;
-  background: rgba(30,41,59,0.95);
-  border-radius:15px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.5);
-}
-.activity-card h3 { color:#2563eb; margin-top:0; }
-.activity-card ul { list-style:none; padding-left:0; margin:0; }
-.activity-card ul li {
-  padding:8px 0;
-  border-bottom:1px solid #334155;
-  display:flex;
-  justify-content:space-between;
-}
-.activity-card ul li:last-child { border-bottom:none; }
-
-/* Desktop: center cards & no scroll */
-@media(min-width:769px){
-  .stats-container {
-    justify-content:center;
-    overflow-x:visible;
-  }
-}
-
-/* Mobile adjustments */
 @media(max-width:768px){
-  nav { gap:10px; }
-  .stat-card {
-    padding:12px;
-    h3 { font-size:16px; margin-bottom:6px; }
-    p { font-size:16px; }
-  }
+  .card { min-width:120px; padding:15px 20px; }
+  nav { flex-direction:column; }
 }
 </style>
 </head>
@@ -152,89 +90,56 @@ nav button:hover { transform:translateY(-2px) scale(1.05); box-shadow:0 6px 20px
 <button id="btn-logout"><i class="fa fa-sign-out-alt"></i> Logout</button>
 
 <header>
-  <img src="inter-milan-old.png" alt="Inter Milan Logo">
-  <h1>Inter Manila — Dashboard</h1>
+  <h1>Dashboard</h1>
 </header>
 
 <nav>
-  <button class="active"><i class="fa fa-home"></i> Dashboard</button>
+  <button onclick="navigate('dashboard')"><i class="fa fa-home"></i> Dashboard</button>
   <button onclick="navigate('squad')"><i class="fa fa-users"></i> Squad</button>
   <button onclick="navigate('matches')"><i class="fa fa-futbol"></i> Matches</button>
   <button onclick="navigate('leagues')"><i class="fa fa-trophy"></i> Leagues</button>
   <button onclick="navigate('leaderboard')"><i class="fa fa-chart-line"></i> Leaderboard</button>
 </nav>
 
-<!-- Welcome -->
-<div id="welcomeCard">
-  <h2 id="welcomeText">Welcome, Admin!</h2>
-  <p>Here’s your recent team overview.</p>
-</div>
-
-<!-- Quick Stats -->
-<div class="stats-container">
-  <div class="stat-card">
-    <h3>Total Players</h3>
-    <p id="totalPlayers">0</p>
-  </div>
-  <div class="stat-card">
-    <h3>Total Matches</h3>
-    <p id="totalMatches">0</p>
-  </div>
-  <div class="stat-card">
-    <h3>Total Goals</h3>
-    <p id="totalGoals">0</p>
-  </div>
-</div>
-
-<!-- Recent Activity -->
-<div class="activity-card">
-  <h3>Recent Activity</h3>
-  <ul id="recentActivity">
-    <li>No activity yet</li>
-  </ul>
+<div class="container">
+  <div class="card">Total Matches: <span id="totalMatches">0</span></div>
+  <div class="card">Wins: <span id="wins">0</span></div>
+  <div class="card">Draws: <span id="draws">0</span></div>
+  <div class="card">Losses: <span id="losses">0</span></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
 <script>
-const firebaseConfig = { /* your firebase config */ };
-const app = firebase.initializeApp(firebaseConfig);
+const firebaseConfig = { /* ISI DENGAN CONFIG FIREBASE-MU */ };
+firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 // Logout
 document.getElementById('btn-logout').addEventListener('click', ()=>{
-  auth.signOut().then(()=>window.location.href="index.html").catch(err=>alert(err.message));
+  auth.signOut().then(()=>window.location.href="index.html");
 });
 
 // Navigation
 function navigate(page){ window.location.href = page+".html"; }
 
-// Set welcome text & stats
+// Cek login
 auth.onAuthStateChanged(user=>{
   if(!user) window.location.href="index.html";
-  document.getElementById('welcomeText').innerText = `Welcome, ${user.displayName || 'Admin'}!`;
 
-  db.collection("players").get().then(snap=>document.getElementById('totalPlayers').innerText = snap.size);
-  db.collection("matches").get().then(snap=>document.getElementById('totalMatches').innerText = snap.size);
+  // Ambil data match dari Firestore
+  db.collection("matches").get().then(snapshot=>{
+    const total = snapshot.size;
+    const wins = snapshot.docs.filter(d=>d.data().result=="win").length;
+    const draws = snapshot.docs.filter(d=>d.data().result=="draw").length;
+    const losses = snapshot.docs.filter(d=>d.data().result=="lose").length;
 
-  db.collection("players").get().then(snap=>{
-    let goals=0;
-    snap.forEach(doc=>{ goals += doc.data().goals || 0; });
-    document.getElementById('totalGoals').innerText = goals;
-  });
-
-  db.collection("players").orderBy("timestamp","desc").limit(5).get().then(snap=>{
-    const ul = document.getElementById('recentActivity');
-    ul.innerHTML = "";
-    if(snap.empty){ ul.innerHTML="<li>No activity yet</li>"; return; }
-    snap.forEach(doc=>{
-      const li = document.createElement('li');
-      const data = doc.data();
-      li.innerHTML = `<span>${data.name} added</span> <span>${new Date(data.timestamp?.toDate()).toLocaleString() || ''}</span>`;
-      ul.appendChild(li);
-    });
+    document.getElementById('totalMatches').innerText = total;
+    document.getElementById('wins').innerText = wins;
+    document.getElementById('draws').innerText = draws;
+    document.getElementById('losses').innerText = losses;
   });
 });
 </script>
