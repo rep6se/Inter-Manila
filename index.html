@@ -1,100 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inter Manila — Login</title>
-<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-<style>
-body {
-  margin:0;
-  font-family:'Segoe UI', Tahoma, sans-serif;
-  background: linear-gradient(135deg,#020617,#0b1e3a);
-  color:#f1f5f9;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-.login-card {
-  background: rgba(30,41,59,0.95);
-  padding:40px 30px;
-  border-radius:20px;
-  box-shadow:0 8px 30px rgba(0,0,0,0.5);
-  text-align:center;
-  width:320px;
-  transition: transform 0.3s;
-}
-.login-card:hover { transform: scale(1.03); }
-.login-card img { width:100px; margin-bottom:15px; transition: transform 0.3s; }
-.login-card img:hover { transform: scale(1.1); }
-.login-card h2 { margin:0 0 20px 0; color:#2563eb; }
-.login-card form { display:flex; flex-direction:column; gap:15px; }
-.login-card input {
-  padding:10px 15px;
-  border-radius:12px;
-  border:none;
-  outline:none;
-  font-size:16px;
-  transition: all 0.3s;
-}
-.login-card input:focus {
-  box-shadow:0 0 8px #3b82f6;
-  background: rgba(59,130,246,0.05);
-}
-.login-card button {
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background: linear-gradient(135deg,#2563eb,#3b82f6);
-  color:white;
-  font-weight:600;
-  font-size:16px;
-  cursor:pointer;
-  transition: all 0.3s ease;
-}
-.login-card button:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow:0 6px 20px rgba(0,0,0,0.5);
-  background: linear-gradient(135deg,#3b82f6,#60a5fa);
-}
-#error-msg { color:#f87171; font-size:14px; height:18px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inter Manila — Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-glow: rgba(37, 99, 235, 0.4);
+            --dark: #020617;
+            --surface: rgba(30, 41, 59, 0.4);
+            --accent: #60a5fa;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --gold: #fbbf24;
+            --silver: #94a3b8;
+            --bronze: #d97706;
+        }
+
+        body { 
+            margin: 0; font-family: 'Segoe UI', sans-serif; 
+            background: radial-gradient(circle at top, #0f172a, #020617); 
+            color: #f1f5f9; min-height: 100vh; 
+            padding-bottom: 100px;
+        }
+
+        header { text-align: center; padding: 50px 0 20px; position: relative; }
+        .logo-main { width: 65px; filter: drop-shadow(0 0 15px var(--primary-glow)); cursor: pointer; transition: 0.3s; }
+        .logo-main:active { transform: scale(0.9); }
+        header h1 { margin: 12px 0 0; font-size: 20px; color: #fff; text-transform: uppercase; letter-spacing: 4px; font-weight: 800; }
+
+        .container { max-width: 450px; margin: 0 auto; padding: 0 18px; }
+        
+        .dashboard-header { 
+            display: flex; justify-content: space-between; align-items: flex-end; 
+            margin-bottom: 25px; padding: 0 5px; 
+        }
+        .welcome-box h2 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+        .welcome-box p { color: var(--accent); margin: 2px 0 0; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        
+        select#seasonFilter { 
+            background: #1e293b; color: white; border: 1px solid rgba(255,255,255,0.1); 
+            padding: 10px 14px; border-radius: 15px; font-size: 11px; font-weight: 700; outline: none;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+        
+        .stat-card { 
+            background: var(--surface); border-radius: 30px; padding: 22px; 
+            border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);
+            position: relative;
+        }
+        .stat-card h3 { margin: 0; font-size: 10px; text-transform: uppercase; color: #64748b; letter-spacing: 1px; font-weight: 800; }
+        .stat-card .val { font-size: 30px; font-weight: 900; margin: 8px 0 2px; display: block; color: #fff; }
+        .stat-sub { font-size: 10px; color: var(--accent); font-weight: 700; margin: 0; }
+
+        .full-card { grid-column: span 2; text-align: center; }
+        .winrate-card { 
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(15, 23, 42, 0.4));
+            border: 1px solid rgba(37, 99, 235, 0.2); 
+        }
+        .winrate-card .val { font-size: 50px; color: var(--accent); text-shadow: 0 0 20px var(--primary-glow); }
+
+        .trophy-card { 
+            grid-column: span 2; 
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), transparent); 
+            border: 1px solid rgba(245, 158, 11, 0.15);
+        }
+        .trophy-header { display: flex; justify-content: space-between; align-items: center; }
+        .trophy-card .val { color: var(--warning); margin: 0; font-size: 35px; }
+        
+        .mini-trophy-list { 
+            display: flex; flex-direction: column; gap: 8px; 
+            margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .mini-t-item { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; color: #f1f5f9; }
+        .mini-t-item i { font-size: 12px; width: 15px; text-align: center; }
+        .mini-t-item span { color: #64748b; font-size: 9px; margin-left: auto; text-transform: uppercase; }
+
+        .form-dots { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot-W { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .dot-L { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+        .dot-D { background: #64748b; }
+
+        .recent-box { 
+            background: var(--surface); border-radius: 30px; padding: 25px; 
+            border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); 
+        }
+        .recent-box h4 { 
+            margin: 0 0 20px 0; font-size: 12px; color: var(--accent); 
+            text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; 
+        }
+        
+        .activity-item { 
+            padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .activity-item:last-child { border: none; }
+        .team-info b { font-size: 15px; color: #fff; display: block; }
+        .team-info small { font-size: 9px; color: #64748b; font-weight: 800; text-transform: uppercase; }
+        
+        .score-pill { 
+            padding: 8px 14px; border-radius: 12px; font-weight: 900; font-size: 15px; 
+            background: #0f172a; border: 1px solid rgba(255,255,255,0.1); 
+            white-space: nowrap;
+        }
+
+        .bottom-nav { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            width: calc(100% - 40px); max-width: 400px; 
+            background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; 
+            display: flex; justify-content: space-around; padding: 10px; z-index: 1000; 
+        }
+        .nav-item { text-align: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 700; padding: 8px 12px; border-radius: 15px; transition: 0.3s; }
+        .nav-item i { display: block; font-size: 18px; margin-bottom: 4px; }
+        .nav-item.active { color: #fff; background: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+    </style>
 </head>
 <body>
 
-<div class="login-card">
-  <img src="inter-milan-old.png" alt="Inter Milan Logo">
-  <h2>Login</h2>
-  <div id="error-msg"></div>
-  <form id="loginForm">
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button type="submit"><i class="fa fa-sign-in-alt"></i> Login</button>
-  </form>
-</div>
+    <header>
+        <img src="inter-milan-old.png" class="logo-main" id="logoBtn">
+        <h1>Inter Manila</h1>
+    </header>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-<script>
-const firebaseConfig = { /* ISI DENGAN CONFIG FIREBASE-MU */ };
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="welcome-box">
+                <h2>Overview</h2>
+                <p id="currentSeasonLabel">All Time Stats</p>
+            </div>
+            <select id="seasonFilter">
+                <option value="all">All Time</option>
+            </select>
+        </div>
 
-const loginForm = document.getElementById('loginForm');
-const errorMsg = document.getElementById('error-msg');
+        <div class="stats-grid">
+            <div class="stat-card winrate-card full-card">
+                <h3>Win Rate</h3>
+                <span class="val" id="winRate">0%</span>
+                <div class="form-dots" id="matchForm"></div>
+            </div>
 
-loginForm.addEventListener('submit', e=>{
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+            <div class="stat-card trophy-card">
+                <div class="trophy-header">
+                    <h3>Club Honors</h3>
+                    <span class="val" id="totalRecords">0</span>
+                </div>
+                <div id="miniTrophyList" class="mini-trophy-list"></div>
+            </div>
 
-  auth.signInWithEmailAndPassword(email, password)
-    .then(userCredential => { window.location.href = "dashboard.html"; })
-    .catch(error => { errorMsg.innerText = error.message; });
-});
-</script>
+            <div class="stat-card">
+                <h3>Matches</h3>
+                <span class="val" id="totalMatches">0</span>
+                <p class="stat-sub" id="wdlText">0W - 0D - 0L</p>
+            </div>
 
+            <div class="stat-card">
+                <h3>Squad</h3>
+                <span class="val" id="totalPlayers">0</span>
+                <p class="stat-sub">Active Players</p>
+            </div>
+
+            <div class="stat-card full-card">
+                <h3>Avg Goals</h3>
+                <span class="val" id="avgGoals">0.0</span>
+                <p class="stat-sub">Per Match</p>
+            </div>
+        </div>
+
+        <div class="recent-box">
+            <h4><i class="fa fa-history"></i> Recent Activity</h4>
+            <div id="recentActivity">
+                <p style="text-align:center; color:#64748b; font-size:11px; padding: 20px;">Fetching data...</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active"><i class="fa fa-home"></i>HOME</a>
+        <a href="matches.html" class="nav-item"><i class="fa fa-futbol"></i>MATCHES</a>
+        <a href="records.html" class="nav-item"><i class="fa fa-medal"></i>RECORDS</a>
+        <a href="squad.html" class="nav-item"><i class="fa fa-users"></i>SQUAD</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp as _0xinit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore as _0xdb, collection as _0xcoll, onSnapshot as _0xsnap, query as _0xqry, orderBy as _0xord, limit as _0xlim } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Firebase Config Obfuscated
+        const _0xcnf = {
+            apiKey: "\x41\x49\x7a\x61\x53\x79\x41\x75\x71\x55\x63\x58\x59\x6a\x4d\x55\x2d\x58\x61\x4c\x5f\x77\x37\x68\x34\x79\x34\x33\x52\x48\x6b\x75\x34\x64\x51\x47\x46\x6c\x6b",
+            authDomain: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x61\x70\x70\x2e\x63\x6f\x6d",
+            projectId: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61",
+            storageBucket: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x73\x74\x6f\x72\x61\x67\x65\x2e\x61\x70\x70",
+            messagingSenderId: "\x32\x38\x35\x35\x30\x37\x32\x37\x39\x33\x34\x32",
+            appId: "\x31\x3a\x32\x38\x35\x35\x30\x37\x32\x37\x39\x33\x34\x32\x3a\x77\x65\x62\x3a\x35\x61\x61\x30\x63\x38\x30\x61\x30\x38\x66\x62\x39\x32\x37\x32\x37\x34\x31\x36\x66\x66"
+        };
+
+        const _0xapp = _0xinit(_0xcnf);
+        const _0xfs = _0xdb(_0xapp);
+        let _0xmtch = [];
+
+        // Real-time Trophy List
+        _0xsnap(_0xqry(_0xcoll(_0xfs, "\x74\x72\x6f\x70\x68\x69\x65\x73"), _0xord("\x74\x69\x6d\x65\x73\x74\x61\x6d\x70", "\x64\x65\x73\x63"), _0xlim(3)), (_0xs) => {
+            document.getElementById('totalRecords').innerText = _0xs.size;
+            const _0xl = document.getElementById('miniTrophyList');
+            if(_0xs.empty) { _0xl.innerHTML = '<div style="font-size:10px; color:#64748b; text-align:center;">No trophies yet</div>'; return; }
+            _0xl.innerHTML = "";
+            _0xs.forEach((_0xd) => {
+                const _0xt = _0xd.data();
+                const _0xc = _0xt.rank === 'gold' ? 'var(--gold)' : (_0xt.rank === 'silver' ? 'var(--silver)' : 'var(--bronze)');
+                const _0xr = _0xt.rank === 'gold' ? 'Winner' : (_0xt.rank === 'silver' ? 'Runner-up' : '3rd Place');
+                _0xl.innerHTML += `<div class="mini-t-item"><i class="fa fa-trophy" style="color:${_0xc}"></i>${_0xr} — ${_0xt.name}<span>${_0xt.season}</span></div>`;
+            });
+        });
+
+        // Players & Matches Logic
+        _0xsnap(_0xcoll(_0xfs, "\x70\x6c\x61\x79\x65\x72\x73"), (_0xs) => {
+            let _0xc = 0; _0xs.forEach(_0xd => { if(_0xd.data().status !== 'Inactive') _0xc++; });
+            document.getElementById('totalPlayers').innerText = _0xc;
+        });
+
+        _0xsnap(_0xqry(_0xcoll(_0xfs, "\x6d\x61\x74\x63\x68\x65\x73"), _0xord("\x74\x69\x6d\x65\x73\x74\x61\x6d\x70", "\x64\x65\x73\x63")), (_0xs) => {
+            _0xmtch = _0xs.docs.map(_0xd => _0xd.data());
+            _0xupdFilter(); _0xrender();
+        });
+
+        function _0xupdFilter() {
+            const _0xsel = document.getElementById('seasonFilter');
+            const _0xsea = [...new Set(_0xmtch.map(_0xm => `${_0xm.league} ${_0xm.season}`.trim()))].filter(Boolean).sort();
+            const _0xcur = _0xsel.value;
+            _0xsel.innerHTML = '<option value="all">All Time</option>';
+            _0xsea.forEach(_0xs => { _0xsel.innerHTML += `<option value="${_0xs}">${_0xs}</option>`; });
+            _0xsel.value = _0xcur;
+        }
+
+        function _0xrender() {
+            const _0xf = document.getElementById('seasonFilter').value;
+            let _0xfil = _0xf === 'all' ? _0xmtch : _0xmtch.filter(_0xm => `${_0xm.league} ${_0xm.season}`.trim() === _0xf);
+            let _0xw = 0, _0xd = 0, _0xl = 0, _0xtg = 0;
+            let _0xrh = "", _0xfh = "";
+
+            _0xfil.forEach((_0xm, _0xi) => {
+                const _0xhs = parseInt(_0xm.homeScore) || 0;
+                const _0xas = parseInt(_0xm.awayScore) || 0;
+                _0xtg += _0xhs;
+                let _0xr = _0xhs > _0xas ? 'W' : (_0xhs < _0xas ? 'L' : 'D');
+                if(_0xr === 'W') _0xw++; else if(_0xr === 'L') _0xl++; else _0xd++;
+                if(_0xi < 5) _0xfh = `<span class="dot dot-${_0xr}"></span>` + _0xfh;
+                if(_0xi < 5) {
+                    _0xrh += `<div class="activity-item"><div class="team-info"><b>vs ${_0xm.opponent}</b><small>${_0xm.league} • ${_0xm.season}</small></div><div class="score-pill" style="color:${_0xr==='W'?'#10b981':_0xr==='L'?'#ef4444':'#94a3b8'}">${_0xhs} - ${_0xas}</div></div>`;
+                }
+            });
+
+            document.getElementById('winRate').innerText = _0xfil.length ? Math.round((_0xw / _0xfil.length) * 100) + "%" : "0%";
+            document.getElementById('totalMatches').innerText = _0xfil.length;
+            document.getElementById('wdlText').innerText = `${_0xw}W - ${_0xd}D - ${_0xl}L`;
+            document.getElementById('avgGoals').innerText = _0xfil.length ? (_0xtg / _0xfil.length).toFixed(1) : "0.0";
+            document.getElementById('matchForm').innerHTML = _0xfh || '<div class="dot"></div>';
+            document.getElementById('recentActivity').innerHTML = _0xrh || '<p style="text-align:center; color:#64748b; font-size:12px; padding:20px;">No matches found.</p>';
+            document.getElementById('currentSeasonLabel').innerText = _0xf === 'all' ? "All Time Stats" : _0xf;
+        }
+
+        document.getElementById('seasonFilter').onchange = _0xrender;
+
+        // Hidden Entry (Tap Logic Obfuscated)
+        let _0xtc = 0, _0xto;
+        document.getElementById('logoBtn').onclick = () => {
+            _0xtc++; clearTimeout(_0xto);
+            _0xto = setTimeout(() => { _0xtc = 0; }, 2000);
+            if (_0xtc >= 5) window.location.href = "\x6c\x6f\x67\x69\x6e\x2e\x68\x74\x6d\x6c";
+        };
+    </script>
 </body>
-  </html>
+          </html>
+          
