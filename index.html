@@ -195,7 +195,6 @@
         import { initializeApp as _0xinit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore as _0xdb, collection as _0xcoll, onSnapshot as _0xsnap, query as _0xqry, orderBy as _0xord, limit as _0xlim } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Firebase Config Obfuscated
         const _0xcnf = {
             apiKey: "\x41\x49\x7a\x61\x53\x79\x41\x75\x71\x55\x63\x58\x59\x6a\x4d\x55\x2d\x58\x61\x4c\x5f\x77\x37\x68\x34\x79\x34\x33\x52\x48\x6b\x75\x34\x64\x51\x47\x46\x6c\x6b",
             authDomain: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x61\x70\x70\x2e\x63\x6f\x6d",
@@ -209,7 +208,7 @@
         const _0xfs = _0xdb(_0xapp);
         let _0xmtch = [];
 
-        // Real-time Trophy List
+        // Trophy List
         _0xsnap(_0xqry(_0xcoll(_0xfs, "\x74\x72\x6f\x70\x68\x69\x65\x73"), _0xord("\x74\x69\x6d\x65\x73\x74\x61\x6d\x70", "\x64\x65\x73\x63"), _0xlim(3)), (_0xs) => {
             document.getElementById('totalRecords').innerText = _0xs.size;
             const _0xl = document.getElementById('miniTrophyList');
@@ -218,17 +217,21 @@
             _0xs.forEach((_0xd) => {
                 const _0xt = _0xd.data();
                 const _0xc = _0xt.rank === 'gold' ? 'var(--gold)' : (_0xt.rank === 'silver' ? 'var(--silver)' : 'var(--bronze)');
-                const _0xr = _0xt.rank === 'gold' ? 'Winner' : (_0xt.rank === 'silver' ? 'Runner-up' : '3rd Place');
-                _0xl.innerHTML += `<div class="mini-t-item"><i class="fa fa-trophy" style="color:${_0xc}"></i>${_0xr} — ${_0xt.name}<span>${_0xt.season}</span></div>`;
+                _0xl.innerHTML += `<div class="mini-t-item"><i class="fa fa-trophy" style="color:${_0xc}"></i>${_0xt.name}<span>${_0xt.season}</span></div>`;
             });
         });
 
-        // Players & Matches Logic
+        // FIXED: Squad Logic (Sinkron dengan active: true/false)
         _0xsnap(_0xcoll(_0xfs, "\x70\x6c\x61\x79\x65\x72\x73"), (_0xs) => {
-            let _0xc = 0; _0xs.forEach(_0xd => { if(_0xd.data().status !== 'Inactive') _0xc++; });
+            let _0xc = 0; 
+            _0xs.forEach(_0xd => { 
+                // Menghitung pemain yang field 'active' nya bukan false
+                if(_0xd.data().active !== false) _0xc++; 
+            });
             document.getElementById('totalPlayers').innerText = _0xc;
         });
 
+        // Matches Logic
         _0xsnap(_0xqry(_0xcoll(_0xfs, "\x6d\x61\x74\x63\x68\x65\x73"), _0xord("\x74\x69\x6d\x65\x73\x74\x61\x6d\x70", "\x64\x65\x73\x63")), (_0xs) => {
             _0xmtch = _0xs.docs.map(_0xd => _0xd.data());
             _0xupdFilter(); _0xrender();
@@ -272,14 +275,13 @@
 
         document.getElementById('seasonFilter').onchange = _0xrender;
 
-        // Hidden Entry (Tap Logic Obfuscated)
+        // Login Entry Logic
         let _0xtc = 0, _0xto;
         document.getElementById('logoBtn').onclick = () => {
             _0xtc++; clearTimeout(_0xto);
             _0xto = setTimeout(() => { _0xtc = 0; }, 2000);
-            if (_0xtc >= 5) window.location.href = "\x6c\x6f\x67\x69\x6e\x2e\x68\x74\x6d\x6c";
+            if (_0xtc >= 5) window.location.href = "login.html";
         };
     </script>
 </body>
-          </html>
-          
+</html>
