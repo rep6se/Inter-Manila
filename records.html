@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inter Manila — Hall of Fame</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb; --primary-glow: rgba(37, 99, 235, 0.4); --dark: #020617;
+            --surface: rgba(30, 41, 59, 0.4); --accent: #60a5fa; --gold: #fbbf24;
+            --silver: #94a3b8; --bronze: #d97706; --success: #10b981; --warning: #f59e0b;
+        }
+
+        body { 
+            margin: 0; font-family: 'Segoe UI', sans-serif; 
+            background: radial-gradient(circle at top, #0f172a, #020617); 
+            color: #f1f5f9; min-height: 100vh; padding-bottom: 110px;
+        }
+
+        header { text-align: center; padding: 50px 0 20px; }
+        header img { width: 65px; filter: drop-shadow(0 0 15px var(--primary-glow)); }
+        header h1 { margin: 12px 0 0; font-size: 20px; color: #fff; text-transform: uppercase; letter-spacing: 4px; font-weight: 800; }
+
+        .container { max-width: 450px; margin: 0 auto; padding: 0 18px; }
+
+        .filter-row { margin-bottom: 25px; }
+        select { 
+            width: 100%; background: #1e293b; color: white; border: 1px solid rgba(255,255,255,0.1); 
+            padding: 15px; border-radius: 20px; font-family: inherit; font-weight: 800; outline: none;
+            appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 20px center; background-size: 15px;
+        }
+
+        .trophy-section { background: rgba(255,255,255,0.03); border-radius: 30px; padding: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .section-label { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .trophy-list { display: flex; flex-direction: column; gap: 8px; }
+        .t-row { display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.2); padding: 12px 15px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.03); }
+        .t-info b { display: block; font-size: 12px; color: #fff; }
+        .t-info span { font-size: 9px; color: #64748b; font-weight: 700; }
+        .t-gold { color: var(--gold); } .t-silver { color: var(--silver); } .t-bronze { color: var(--bronze); }
+
+        .awards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .award-box { background: var(--surface); padding: 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.08); text-align: center; backdrop-filter: blur(10px); }
+        .award-box i { font-size: 24px; margin-bottom: 10px; display: block; }
+        .award-box.motm i { color: var(--success); }
+        .award-box.mvp i { color: var(--gold); }
+        .award-box .p-name { display: block; font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 2px; }
+        .award-box .p-count { font-size: 10px; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+        .admin-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 30px; }
+        .stat-card { background: rgba(15, 23, 42, 0.5); border-radius: 18px; padding: 12px 5px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .stat-card b { display: block; font-size: 18px; color: #fff; line-height: 1; margin-bottom: 5px; }
+        .stat-card small { font-size: 8px; color: #64748b; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+
+        .tab-nav { display: flex; background: rgba(15, 23, 42, 0.6); padding: 6px; border-radius: 20px; margin-bottom: 20px; gap: 6px; }
+        .tab-btn { flex: 1; border: none; background: none; color: #64748b; padding: 12px; border-radius: 15px; font-weight: 800; font-size: 11px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 5px 15px var(--primary-glow); }
+
+        .record-container { display: none; }
+        .record-container.active { display: block; }
+
+        .player-row { background: var(--surface); border-radius: 25px; padding: 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; cursor: pointer;}
+        .rank-num { font-size: 15px; font-weight: 900; color: #64748b; width: 30px; text-align: center; z-index: 1; }
+        .progress-bar { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, rgba(37, 99, 235, 0.1), transparent); z-index: 0; border-left: 4px solid var(--primary); transition: 0.5s; }
+
+        .modal { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(15px); }
+        .modal-content { background: #1e293b; width: 85%; max-width: 380px; margin: 60px auto; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
+        .modal-header { background: linear-gradient(135deg, var(--primary), #1e40af); padding: 40px 20px 30px; text-align: center; }
+        .avatar-circle { width: 80px; height: 80px; background: white; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; }
+        .avatar-circle i { font-size: 40px; color: var(--primary); }
+        .mini-stat-list { padding: 25px; }
+        .mini-stat-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .mini-stat-row:last-child { border-bottom: none; }
+        .mini-stat-row span { font-size: 13px; color: #94a3b8; font-weight: 600; }
+        .mini-stat-row b { color: #fff; font-size: 15px; font-weight: 800; }
+
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 400px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; display: flex; justify-content: space-around; padding: 10px; z-index: 1000; }
+        .nav-item { text-align: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 700; padding: 8px 12px; border-radius: 15px; transition: 0.3s; }
+        .nav-item i { display: block; font-size: 18px; margin-bottom: 4px; }
+        .nav-item.active { color: #fff; background: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+    </style>
+</head>
+<body>
+
+    <header><img src="inter-milan-old.png" alt="Logo"><h1>Hall of Fame</h1></header>
+
+    <div class="container">
+        <div class="filter-row"><select id="seasonFilter"><option value="all">All Time Records</option></select></div>
+        <div class="trophy-section">
+            <div class="section-label"><span>Club Honors</span><i class="fa fa-trophy" style="color:var(--gold)"></i></div>
+            <div id="trophyList" class="trophy-list"><p style="text-align:center; font-size:11px; color:#64748b;">Loading...</p></div>
+        </div>
+        <div class="awards-grid">
+            <div class="award-box motm"><i class="fa fa-medal"></i><span class="p-name" id="bestMOTM">-</span><span class="p-count" id="countMOTM">0 MOTM</span></div>
+            <div class="award-box mvp"><i class="fa fa-crown"></i><span class="p-name" id="bestMVP">-</span><span class="p-count" id="countMVP">0 MVP</span></div>
+        </div>
+        <div class="admin-summary">
+            <div class="stat-card"><b id="teamGoals">0</b><small>Goals</small></div>
+            <div class="stat-card"><b id="teamAssists">0</b><small>Assists</small></div>
+            <div class="stat-card"><b id="teamSaves">0</b><small>Saves</small></div>
+            <div class="stat-card"><b id="teamCS">0</b><small>CS</small></div>
+        </div>
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="_0xsw('goals', this)">Goals</button>
+            <button class="tab-btn" onclick="_0xsw('assists', this)">Assists</button>
+            <button class="tab-btn" onclick="_0xsw('saves', this)">Saves</button>
+        </div>
+        <div id="goals" class="record-container active"></div><div id="assists" class="record-container"></div><div id="saves" class="record-container"></div>
+    </div>
+
+    <div id="pModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="avatar-circle"><i class="fa fa-user"></i></div>
+                <h2 id="mName" style="margin:0; color:#fff; font-weight: 800;">-</h2>
+                <div id="mPos" style="font-size:11px; color:var(--accent); font-weight:800; text-transform:uppercase; margin-top:5px;">-</div>
+            </div>
+            <div class="mini-stat-list">
+                <div class="mini-stat-row"><span>Appearances</span><b id="mApps">0</b></div>
+                <div class="mini-stat-row"><span>Goals</span><b id="mGoals">0</b></div>
+                <div class="mini-stat-row"><span>Assists</span><b id="mAssists">0</b></div>
+                <div class="mini-stat-row"><span>Saves</span><b id="mSaves">0</b></div>
+                <div class="mini-stat-row"><span>🏆 MOTM</span><b id="mDetailMOTM" style="color:var(--success)">0</b></div>
+                <div class="mini-stat-row"><span>👑 MVP</span><b id="mDetailMVP" style="color:var(--warning)">0</b></div>
+            </div>
+            <button onclick="_0xcP()" style="width:100%; padding:20px; background:none; border:none; color:#64748b; font-weight:800; cursor:pointer;">CLOSE PROFILE</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><i class="fa fa-home"></i>HOME</a>
+        <a href="matches.html" class="nav-item"><i class="fa fa-futbol"></i>MATCHES</a>
+        <a href="records.html" class="nav-item active"><i class="fa fa-medal"></i>RECORDS</a>
+        <a href="squad.html" class="nav-item"><i class="fa fa-users"></i>SQUAD</a>
+    </nav>
+
+    <script type="module">
+        import { initializeApp as _0xI } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore as _0xF, collection as _0xC, onSnapshot as _0xS, query as _0xQ, orderBy as _0xO } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const _0xc = {
+            apiKey: "\x41\x49\x7a\x61\x53\x79\x41\x75\x71\x55\x63\x58\x59\x6a\x4d\x55\x2d\x58\x61\x4c\x5f\x77\x37\x68\x34\x79\x34\x33\x52\x48\x6b\x75\x34\x64\x51\x47\x46\x6c\x6b",
+            authDomain: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x61\x70\x70\x2e\x63\x6f\x6d",
+            projectId: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61",
+            storageBucket: "\x69\x6e\x74\x65\x72\x2d\x6d\x61\x6e\x69\x6c\x61\x2e\x66\x69\x72\x65\x62\x61\x73\x65\x73\x74\x6f\x72\x61\x67\x65\x2e\x61\x70\x70",
+            messagingSenderId: "\x32\x38\x35\x35\x30\x37\x32\x37\x39\x33\x34\x32",
+            appId: "\x31\x3a\x32\x38\x35\x35\x30\x37\x32\x37\x39\x33\x34\x32\x3a\x77\x65\x62\x3a\x35\x61\x61\x30\x63\x38\x30\x61\x30\x38\x66\x62\x39\x32\x37\x32\x37\x34\x31\x36\x66\x66"
+        };
+
+        const _0xA = _0xI(_0xc);
+        const _0xdb = _0xF(_0xA);
+        let _0xaM = [], _0xaP = [], _0xpS = {};
+
+        _0xS(_0xQ(_0xC(_0xdb, "\x74\x72\x6f\x70\x68\x69\x65\x73"), _0xO("\x74\x69\x6d\x65\x73\x74\x61\x6d\x70", "\x64\x65\x73\x63")), (sn) => {
+            const l = document.getElementById('trophyList');
+            l.innerHTML = sn.empty ? '<p style="text-align:center;font-size:11px;color:#64748b;">No records.</p>' : "";
+            sn.forEach(d => {
+                const t = d.data();
+                const i = t.rank === 'gold' ? 'fa-trophy t-gold' : (t.rank === 'silver' ? 'fa-medal t-silver' : 'fa-award t-bronze');
+                l.innerHTML += `<div class="t-row"><i class="fa ${i}"></i><div class="t-info"><b>${t.rank.toUpperCase()} — ${t.name}</b><span>${t.season}</span></div></div>`;
+            });
+        });
+
+        _0xS(_0xC(_0xdb, "\x6d\x61\x74\x63\x68\x65\x73"), (ms) => {
+            _0xaM = ms.docs.map(d => d.data());
+            _0xuD();
+            _0xS(_0xC(_0xdb, "\x70\x6c\x61\x79\x65\x72\x73"), (ps) => {
+                _0xaP = ps.docs.map(d => ({id: d.id, ...d.data()}));
+                _0xpD();
+            });
+        });
+
+        function _0xuD() {
+            const s = document.getElementById('seasonFilter');
+            const v = s.value;
+            const l = [...new Set(_0xaM.map(m => `${m.league||''} ${m.season||''}`.trim()))].filter(x => x!=="").sort();
+            let h = '<option value="all">All Time Records</option>';
+            l.forEach(x => h += `<option value="${x}" ${v===x?'selected':''}>${x}</option>`);
+            s.innerHTML = h;
+        }
+
+        document.getElementById('seasonFilter').onchange = () => _0xpD();
+
+        function _0xpD() {
+            const f = document.getElementById('seasonFilter').value;
+            const fd = f === 'all' ? _0xaM : _0xaM.filter(m => `${m.league||''} ${m.season||''}`.trim() === f);
+            let tg=0, ta=0, ts=0, tc=0; _0xpS = {};
+            _0xaP.forEach(p => _0xpS[p.id] = { ...p, goals:0, assists:0, saves:0, apps:0, motm:0, mvp:0 });
+            fd.forEach(m => {
+                const hs = parseInt(m.homeScore)||0, as = parseInt(m.awayScore)||0; tg += hs; if(as===0) tc++;
+                if(m.motmId && _0xpS[m.motmId]) _0xpS[m.motmId].motm++;
+                if(m.mvpId && _0xpS[m.mvpId]) _0xpS[m.mvpId].mvp++;
+                const mp = new Set();
+                if(m.scorers) {
+                    m.scorers.forEach(s => {
+                        if(_0xpS[s.id]) {
+                            _0xpS[s.id].goals += (parseInt(s.goals)||0); _0xpS[s.id].assists += (parseInt(s.assists)||0);
+                            _0xpS[s.id].saves += (parseInt(s.saves)||0); ta += (parseInt(s.assists)||0); ts += (parseInt(s.saves)||0); mp.add(s.id);
+                        }
+                    });
+                }
+                mp.forEach(id => _0xpS[id].apps++);
+            });
+            document.getElementById('teamGoals').innerText = tg; document.getElementById('teamAssists').innerText = ta;
+            document.getElementById('teamSaves').innerText = ts; document.getElementById('teamCS').innerText = tc;
+            const list = Object.values(_0xpS);
+            const tMo = [...list].sort((a,b) => b.motm - a.motm)[0];
+            const tMv = [...list].sort((a,b) => b.mvp - a.mvp)[0];
+            document.getElementById('bestMOTM').innerText = (tMo?.motm>0)?tMo.name:"-";
+            document.getElementById('countMOTM').innerText = `${tMo?.motm||0} MOTM`;
+            document.getElementById('bestMVP').innerText = (tMv?.mvp>0)?tMv.name:"-";
+            document.getElementById('countMVP').innerText = `${tMv?.mvp||0} MVP`;
+            _0xrL('goals', list, 'goals'); _0xrL('assists', list, 'assists'); _0xrL('saves', list, 'saves');
+        }
+
+        function _0xrL(ci, da, fi) {
+            const c = document.getElementById(ci);
+            const so = da.filter(p => p[fi] > 0).sort((a,b) => b[fi] - a[fi]);
+            const mx = so.length ? so[0][fi] : 1;
+            c.innerHTML = so.map((p, i) => {
+                let md = `#${i+1}`; if(i===0) md='🥇'; else if(i===1) md='🥈'; else if(i===2) md='🥉';
+                return `<div class="player-row" onclick="_0xsP('${p.id}')"><div class="progress-bar" style="width:${(p[fi]/mx)*100}%"></div><div class="rank-num">${md}</div><div style="flex:1;z-index:1"><b style="color:#fff">${p.name}</b><div style="font-size:9px;color:#64748b;font-weight:800;">${p.pos||'PLAYER'}</div></div><b style="color:var(--accent);font-size:18px;z-index:1">${p[fi]}</b></div>`;
+            }).join('') || '<p style="text-align:center;padding:40px;color:#64748b;font-size:11px;">No data.</p>';
+        }
+
+        window._0xsP = (id) => {
+            const p = _0xpS[id];
+            document.getElementById('mName').innerText = p.name; document.getElementById('mPos').innerText = p.pos||'PLAYER';
+            ['Apps','Goals','Assists','Saves','DetailMOTM','DetailMVP'].forEach(f => {
+                let k = f.toLowerCase().replace('detail','');
+                document.getElementById('m'+f).innerText = p[k];
+            });
+            document.getElementById('pModal').style.display = 'block';
+        };
+        window._0xcP = () => document.getElementById('pModal').style.display='none';
+        window._0xsw = (id, b) => {
+            document.querySelectorAll('.record-container').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+            document.getElementById(id).classList.add('active'); b.classList.add('active');
+        };
+    </script>
+</body>
+</html>
