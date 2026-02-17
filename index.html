@@ -967,24 +967,27 @@ onSnapshot(query(collection(db, "matches"), orderBy("timestamp", "desc")), (snap
         }
 
         function renderPlayerList(list, containerId, statusClass, statusLabel) {
-            const container = document.getElementById(containerId);
-            if (list.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#64748b; font-size:11px; padding:40px;">No players found.</p>';
-                return;
-            }
-            container.innerHTML = list.map(p => {
-                const posLabel = Array.isArray(p.pos) ? p.pos[0] : (p.pos || 'PLAYER');
-                return `
-                    <div class="player-card" onclick="showPlayerModal('${p.id}')">
-                        <div class="player-avatar"><i class="fa fa-user-shield"></i></div>
-                        <div>
-                            <span class="p-name">${p.name}</span>
-                            <div class="pos-group"><span class="pos-badge">${posLabel}</span></div>
-                        </div>
-                        <div class="status-tag ${statusClass}">${statusLabel}</div>
-                    </div>`;
-            }).join('');
-        }
+    const container = document.getElementById(containerId);
+    if (list.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#64748b; font-size:11px; padding:40px;">No players found.</p>';
+        return;
+    }
+    container.innerHTML = list.map(p => {
+        const posBadges = Array.isArray(p.pos) 
+            ? p.pos.map(pos => `<span class="pos-badge">${pos}</span>`).join('') 
+            : `<span class="pos-badge">${p.pos || 'PLAYER'}</span>`;
+
+        return `
+            <div class="player-card" onclick="showPlayerModal('${p.id}')">
+                <div class="player-avatar"><i class="fa fa-user-shield"></i></div>
+                <div>
+                    <span class="p-name">${p.name}</span>
+                    <div class="pos-group">${posBadges}</div>
+                </div>
+                <div class="status-tag ${statusClass}">${statusLabel}</div>
+            </div>`;
+    }).join('');
+}
 
         window.switchSquad = (type, btn) => {
             document.querySelectorAll('.squad-container').forEach(c => c.classList.remove('active'));
